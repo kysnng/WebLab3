@@ -5,27 +5,23 @@ import jakarta.inject.Inject
 import jakarta.inject.Named
 import org.example.models.PointCheck
 import org.example.models.ResultBean
-import org.example.repositories.ResultRepository
 import org.example.services.AreaCheckBean
 import java.io.Serializable
 
 @Named
 @ViewScoped
-open class PointBean : Serializable {
+class PointBean : Serializable {
     var x: String = ""
     var y: String = ""
     var r: String = ""
     var error: String? = null
     var lastPoint: PointCheck? = null
 
-    @Inject
-    lateinit var areaCheckBean: AreaCheckBean
+    @field:Inject
+    private lateinit var areaCheckBean: AreaCheckBean
 
-    @Inject
-    lateinit var resultBean: ResultBean
-
-    @Inject
-    lateinit var resultRepository: ResultRepository
+    @field:Inject
+    private lateinit var resultBean: ResultBean
 
     fun submit(): String? {
         val isValid = areaCheckBean.validateInputStrings(x, y, r)
@@ -45,9 +41,6 @@ open class PointBean : Serializable {
 
         resultBean.add(pointCheck)
         resultBean.trimTo(20)
-
-        resultRepository.saveFromPoint(pointCheck)
-
         lastPoint = pointCheck
         error = null
 
