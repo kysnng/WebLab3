@@ -13,18 +13,18 @@
     --grid:8px;
 }
 
-@font-face {
-    font-family: 'Advaken Sans';
-    src: url('../fonts/Advaken Sans.otf') format('opentype');
-    font-weight: normal;
-    font-style: normal;
-}
-@font-face {
-    font-family: 'Random Grotesque';
-    src: url('../fonts/RG-SpaciousBook.ttf') format('opentype');
-    font-weight: normal;
-    font-style: normal;
-}
+/*@font-face {*/
+/*    font-family: 'Advaken Sans';*/
+/*    src: url('../fonts/AdvakenSans.otf') format('opentype');*/
+/*    font-weight: normal;*/
+/*    font-style: normal;*/
+/*}*/
+/*@font-face {*/
+/*    font-family: 'Random Grotesque';*/
+/*    src: url('../fonts/RG-SpaciousBook.ttf') format('opentype');*/
+/*    font-weight: normal;*/
+/*    font-style: normal;*/
+/*}*/
 
 *{box-sizing:border-box}
 html,body{height:100%}

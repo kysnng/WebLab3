@@ -10,13 +10,27 @@
     <title>Лабораторная работа №2</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <h:outputStylesheet library="css" name="style.css"/>
+    <!-- /context/javax.faces.resource/style.css?ln=css -->
+    <h:outputStylesheet library="css" name="style.css" />
+    <style type="text/css">
+        @font-face {
+            font-family: "Advaken Sans";
+            src: url("#{resource['fonts:AdvakenSans.otf']}") format("opentype");
+            font-weight: normal;
+            font-style: normal;
+        }
 
-    <h:outputScript library="js" name="main.js" target="body"/>
+        @font-face {
+            font-family: "Random Grotesque";
+            src: url("#{resource['fonts:RG-SpaciousBook.ttf']}") format("opentype");
+            font-weight: normal;
+            font-style: normal;
+        }
+    </style>
+    <h:outputScript library="js" name="main.js" target="body" />
 </h:head>
 
 <h:body>
-    <!-- Мониторинг прогрузки вара -->
     <div class="container">
         <!-- Header -->
         <header class="header">
@@ -49,17 +63,18 @@
                         <h:selectOneMenu id="x-select"
                                          value="#{pointBean.x}"
                                          styleClass="x-row"
-                                         aria-label="Выбор X">
-                            <f:selectItem itemValue="" itemLabel="Выбери X" noSelectionOption="true"/>
-                            <f:selectItem itemValue="-2" itemLabel="-2"/>
-                            <f:selectItem itemValue="-1.5" itemLabel="-1.5"/>
-                            <f:selectItem itemValue="-1" itemLabel="-1"/>
-                            <f:selectItem itemValue="-0.5" itemLabel="-0.5"/>
-                            <f:selectItem itemValue="0" itemLabel="0"/>
-                            <f:selectItem itemValue="0.5" itemLabel="0.5"/>
-                            <f:selectItem itemValue="1" itemLabel="1"/>
-                            <f:selectItem itemValue="1.5" itemLabel="1.5"/>
-                            <f:selectItem itemValue="2" itemLabel="2"/>
+                                         aria-label="Выбор X"
+                                         required="true">
+                            <f:selectItem itemValue="" itemLabel="Выбери X" noSelectionOption="true" />
+                            <f:selectItem itemValue="-2"   itemLabel="-2" />
+                            <f:selectItem itemValue="-1.5" itemLabel="-1.5" />
+                            <f:selectItem itemValue="-1"   itemLabel="-1" />
+                            <f:selectItem itemValue="-0.5" itemLabel="-0.5" />
+                            <f:selectItem itemValue="0"    itemLabel="0" />
+                            <f:selectItem itemValue="0.5"  itemLabel="0.5" />
+                            <f:selectItem itemValue="1"    itemLabel="1" />
+                            <f:selectItem itemValue="1.5"  itemLabel="1.5" />
+                            <f:selectItem itemValue="2"    itemLabel="2" />
                         </h:selectOneMenu>
                     </div>
 
@@ -69,36 +84,52 @@
                         <h:inputText id="y"
                                      value="#{pointBean.y}"
                                      styleClass="input"
-                                     placeholder="Введите Y от -5 до 5"/>
+                                     maxlength="8"
+                                     placeholder="Введите Y от -5 до 5" />
                     </div>
 
                     <!-- R -->
                     <div class="field">
-                        <span class="label">Координата R:</span>
-                        <div class="row" role="group" aria-label="Выбор R">
-                            <!-- Можно стилизовать h:selectOneRadio, но пока оставим простым -->
-                            <h:selectOneRadio id="r"
-                                              value="#{pointBean.r}">
-                                <f:selectItem itemValue="1" itemLabel="1"/>
-                                <f:selectItem itemValue="1.5" itemLabel="1.5"/>
-                                <f:selectItem itemValue="2" itemLabel="2"/>
-                                <f:selectItem itemValue="2.5" itemLabel="2.5"/>
-                                <f:selectItem itemValue="3" itemLabel="3"/>
-                            </h:selectOneRadio>
+                        <label class="label">Координата R:</label>
+                        <div class="row" role="group" aria-label="Выбор R" id="r-chips">
+                            <!-- Вёрстка как в идеальном HTML -->
+                            <label class="chip">
+                                1
+                                <input type="radio" name="r-chip" value="1" />
+                            </label>
+                            <label class="chip">
+                                1.5
+                                <input type="radio" name="r-chip" value="1.5" />
+                            </label>
+                            <label class="chip">
+                                2
+                                <input type="radio" name="r-chip" value="2" />
+                            </label>
+                            <label class="chip">
+                                2.5
+                                <input type="radio" name="r-chip" value="2.5" />
+                            </label>
+                            <label class="chip">
+                                3
+                                <input type="radio" name="r-chip" value="3" />
+                            </label>
                         </div>
+
+                        <!-- Сюда JS будет писать выбранный R, чтобы JSF-бин его получил -->
+                        <h:inputHidden id="r" value="#{pointBean.r}" />
                     </div>
 
                     <!-- Action -->
                     <div class="actions">
                         <h:commandButton value="ПРОВЕРИТЬ ТОЧКУ"
                                          styleClass="btn"
-                                         action="#{pointBean.submit}"/>
+                                         action="#{pointBean.submit}" />
                     </div>
 
                     <!-- Ошибка -->
                     <h:panelGroup rendered="#{not empty pointBean.error}">
                         <div class="kpi miss" style="margin-top:12px">
-                            <h:outputText value="#{pointBean.error}"/>
+                            <h:outputText value="#{pointBean.error}" />
                         </div>
                     </h:panelGroup>
                 </h:form>
@@ -113,19 +144,17 @@
                 <table aria-label="История попаданий">
                     <thead>
                     <tr>
-                        <th style="text-align:center">Результат</th>
+                        <th style="text-align:center">Попадания</th>
                         <th style="text-align:center">X</th>
                         <th style="text-align:center">Y</th>
                         <th style="text-align:center">R</th>
-                        <th style="text-align:center">Время работы (мс)</th>
-                        <th style="text-align:center">Время запроса</th>
                     </tr>
                     </thead>
                     <tbody id="results-body">
                     <!-- Пусто -->
                     <ui:fragment rendered="#{empty pointBean.results}">
                         <tr class="empty-row">
-                            <td colspan="6" style="text-align:center;opacity:.7">
+                            <td colspan="4" style="text-align:center;opacity:.7">
                                 Пока нет результатов
                             </td>
                         </tr>
@@ -134,16 +163,10 @@
                     <!-- Есть результаты -->
                     <ui:repeat value="#{pointBean.results}" var="p">
                         <tr class="#{p.result ? 'hit' : 'miss'}">
-                            <td><h:outputText value="#{p.resultText}"/></td>
-                            <td><h:outputText value="#{p.x}"/></td>
-                            <td><h:outputText value="#{p.y}"/></td>
-                            <td><h:outputText value="#{p.r}"/></td>
-                            <td>
-                                <h:outputText value="#{p.execTimeMs}">
-                                    <f:convertNumber maxFractionDigits="3"/>
-                                </h:outputText>
-                            </td>
-                            <td><h:outputText value="#{p.formattedTimestamp}"/></td>
+                            <td><h:outputText value="#{p.resultText}" /></td>
+                            <td><h:outputText value="#{p.x}" /></td>
+                            <td><h:outputText value="#{p.y}" /></td>
+                            <td><h:outputText value="#{p.r}" /></td>
                         </tr>
                     </ui:repeat>
                     </tbody>
