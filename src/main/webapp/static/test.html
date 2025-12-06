@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <title>Лабораторная — Часы</title>
+    <link rel="stylesheet" href="../resources/css/style.css"/>
+    <link rel="stylesheet" href="../resources/css/test.css">
+</head>
+<body>
+<div class="container">
+    <header class="header">
+        <h1 class="header__title">Лабораторная работа 2</h1>
+        <p class="header__meta">
+            <span><strong>ФИО:</strong> Соловьев Даниил Дмитриевич</span>
+            <span><strong>Группа:</strong> Р3222</span>
+            <span><strong>ИСУ:</strong> 467550</span>
+        </p>
+    </header>
+
+    <div class="clock-page">
+        <div class="clock-wrap">
+            <div class="clock" id="clock">
+                <div class="mark"></div>
+                <div class="hand hour" id="h"></div>
+                <div class="hand minute" id="m"></div>
+                <div class="hand second" id="s"></div>
+                <div class="stem"></div>
+
+                <div class="num n12"><span>12</span></div>
+                <div class="num n1"><span>1</span></div>
+                <div class="num n2"><span>2</span></div>
+                <div class="num n3"><span>3</span></div>
+                <div class="num n4"><span>4</span></div>
+                <div class="num n5"><span>5</span></div>
+                <div class="num n6"><span>6</span></div>
+                <div class="num n7"><span>7</span></div>
+                <div class="num n8"><span>8</span></div>
+                <div class="num n9"><span>9</span></div>
+                <div class="num n10"><span>10</span></div>
+                <div class="num n11"><span>11</span></div>
+            </div>
+
+
+            <a class="btn btn-primary">на основную страницу</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    const h=document.getElementById('h'),m=document.getElementById('m'),s=document.getElementById('s');
+    function setTime(){
+        const d=new Date();
+        const sec=d.getSeconds(), min=d.getMinutes(), hr=d.getHours()%12;
+        const sDeg=sec*6, mDeg=min*6+sec*0.1, hDeg=hr*30+min*0.5;
+        s.style.transform=`translate(-50%,-100%) rotate(${sDeg}deg)`;
+        m.style.transform=`translate(-50%,-100%) rotate(${mDeg}deg)`;
+        h.style.transform=`translate(-50%,-100%) rotate(${hDeg}deg)`;
+    }
+    setTime();
+    setInterval(setTime,1000);
+</script>
+</body>
+</html>

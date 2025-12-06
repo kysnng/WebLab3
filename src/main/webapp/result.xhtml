@@ -1,137 +1,135 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ taglib prefix="c" uri="jakarta.tags.core" %>
-<%
-    // На всякий случай
-    Object pc = request.getAttribute("pointCheck");
-    if (pc == null) {
-        request.getRequestDispatcher("/index.xhtml").forward(request, response);
-        return;
-    }
-%>
-<!doctype html>
-<html lang="ru">
-<head>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:svg="http://www.w3.org/2000/svg"
+      lang="ru">
+
+<h:head>
     <meta charset="utf-8"/>
-    <title>Результат — ${pointCheck.resultText}</title>
+    <title>
+        Результат —
+        <h:outputText
+                value="#{empty pointBean.lastPoint ? '—' : pointBean.lastPoint.resultText}"/>
+    </title>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <link rel="stylesheet" href="static/css/result.css"/>
-</head>
-<body>
-<main class="stage">
-    <div class="word">
-        <!-- Вариант HIT -->
-        <c:if test="${pointCheck.result}">
-            <!-- H -->
-            <div class="circle circle--h">
-                <div class="handle handle--top"></div>
-                <div class="handle handle--bottom"></div>
-            </div>
+    <h:outputStylesheet library="css" name="style.css"/>
+    <h:outputStylesheet library="css" name="result.css"/>
+</h:head>
 
-            <!-- I -->
-            <div class="circle circle--i">
-                <div class="handle handle--left"></div>
-                <div class="handle handle--right"></div>
-            </div>
+<h:body>
+    <main class="stage">
+        <div class="word">
+            <!-- Вариант HIT -->
+            <h:panelGroup rendered="#{not empty pointBean.lastPoint and pointBean.lastPoint.result}">
+                <div class="circle circle--h">
+                    <div class="handle handle--top"></div>
+                    <div class="handle handle--bottom"></div>
+                </div>
 
-            <!-- T -->
-            <div class="circle circle--t">
-                <svg class="t-handles" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
-                    <!-- ЛЕВАЯ -->
-                    <g class="t-node t-node--left" transform="translate(28.5, 75)">
-                        <rect class="t-rect t-rect--left" x="-7" y="-7" width="9" height="9" rx="7"/>
-                    </g>
-                    <!-- ПРАВАЯ -->
-                    <g class="t-node t-node--right" transform="translate(77.5, 75)">
-                        <rect class="t-rect t-rect--right" x="-7" y="-7" width="9" height="9" rx="7"/>
-                    </g>
-                </svg>
-            </div>
-        </c:if>
+                <div class="circle circle--i">
+                    <div class="handle handle--left"></div>
+                    <div class="handle handle--right"></div>
+                </div>
 
-        <!-- Вариант MISS -->
-        <c:if test="${!pointCheck.result}">
-            <div class="spec-circle--x">
-                <svg class="x-handles" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
-                    <defs>
-                        <mask id="x-cut" maskUnits="userSpaceOnUse">
-                            <rect x="0" y="0" width="100" height="100" fill="black"/>
-                            <rect class="rect-mask--x" x="0" y="0" width="100" height="100" rx="50" fill="white"/>
-                            <g fill="black">
-                                <g class="x-triangle--top" transform="translate(50, 0)">
-                                    <polygon points="-18,0 0,36 18,0"/>
-                                </g>
-                                <g class="x-triangle--right" transform="translate(0, 50)">
-                                    <polygon points="0,-18 0,18 36,0"/>
-                                </g>
-                                <g class="x-triangle--bottom" transform="translate(50, 100)">
-                                    <polygon points="-18,0 18,0 0,-36"/>
-                                </g>
-                                <g class="x-triangle--left" transform="translate(100, 50)">
-                                    <polygon points="0,-18 0,18 -36,0"/>
-                                </g>
-                            </g>
-                        </mask>
-                    </defs>
-                    <rect width="100" height="100" class="spec-rect--x"/>
-                </svg>
-            </div>
-            <div class="miss-text">MISS</div>
-        </c:if>
-    </div>
+                <div class="circle circle--t">
+                    <svg:svg class="t-handles" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+                        <svg:g class="t-node t-node--left" transform="translate(28.5, 75)">
+                            <svg:rect class="t-rect t-rect--left" x="-7" y="-7" width="9" height="9" rx="7"/>
+                        </svg:g>
+                        <svg:g class="t-node t-node--right" transform="translate(77.5, 75)">
+                            <svg:rect class="t-rect t-rect--right" x="-7" y="-7" width="9" height="9" rx="7"/>
+                        </svg:g>
+                    </svg:svg>
+                </div>
+            </h:panelGroup>
 
-    <!-- Таблица результатов -->
-    <div class="results">
-        <table aria-label="Результаты попадания">
-            <thead>
-            <tr>
-                <th style="text-align:center">Результат</th>
-                <th style="text-align:center">X</th>
-                <th style="text-align:center">Y</th>
-                <th style="text-align:center">R</th>
-                <th style="text-align:center">Время работы</th>
-                <th style="text-align:center">Время запроса</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr class="${pointCheck.result ? 'hit' : 'miss'}">
-                <td>${pointCheck.resultText}</td>
-                <td>${pointCheck.x}</td>
-                <td>${pointCheck.y}</td>
-                <td>${pointCheck.r}</td>
-                <td>
-                    <c:choose>
-                        <c:when test="${pointCheck.execTimeMs > 0}">
-                            ${String.format("%.3f", pointCheck.execTimeMs)} мс
-                        </c:when>
-                        <c:otherwise>—</c:otherwise>
-                    </c:choose>
-                </td>
-                <td>${pointCheck.formattedTimestamp}</td>
-            </tr>
-            </tbody>
-        </table>
-
-        <div style="margin-top:16px">
-            <a href="${pageContext.request.contextPath}/controller"
-               style="color:#F4EDE3;text-decoration:underline">Вернуться к форме</a>
+            <!-- Вариант MISS -->
+            <h:panelGroup rendered="#{not empty pointBean.lastPoint and not pointBean.lastPoint.result}">
+                <div class="spec-circle--x">
+                    <svg:svg class="x-handles" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+                        <svg:defs>
+                            <svg:mask id="x-cut" maskUnits="userSpaceOnUse">
+                                <svg:rect x="0" y="0" width="100" height="100" fill="black"/>
+                                <svg:rect class="rect-mask--x" x="0" y="0" width="100" height="100" rx="50" fill="white"/>
+                                <svg:g fill="black">
+                                    <svg:g class="x-triangle--top" transform="translate(50, 0)">
+                                        <svg:polygon points="-18,0 0,36 18,0"/>
+                                    </svg:g>
+                                    <svg:g class="x-triangle--right" transform="translate(0, 50)">
+                                        <svg:polygon points="0,-18 0,18 36,0"/>
+                                    </svg:g>
+                                    <svg:g class="x-triangle--bottom" transform="translate(50, 100)">
+                                        <svg:polygon points="-18,0 18,0 0,-36"/>
+                                    </svg:g>
+                                    <svg:g class="x-triangle--left" transform="translate(100, 50)">
+                                        <svg:polygon points="0,-18 0,18 -36,0"/>
+                                    </svg:g>
+                                </svg:g>
+                            </svg:mask>
+                        </svg:defs>
+                        <svg:rect width="100" height="100" class="spec-rect--x"/>
+                    </svg:svg>
+                </div>
+                <div class="miss-text">MISS</div>
+            </h:panelGroup>
         </div>
-    </div>
-</main>
 
-<!-- Запуск анимаций после загрузки DOM -->
-<script>
-    window.addEventListener("DOMContentLoaded", () => {
-        const stage = document.querySelector(".stage");
-        <%-- hit --%>
-        if (${pointCheck.result}) {
-            setTimeout(() => stage.classList.add("is-playing"), 300);
-        } else {
-            // miss
-            stage.classList.remove("is-playing");
-            setTimeout(() => stage.classList.add("is-playing"), 300);
-            setTimeout(() => stage.classList.add("is-moving"), 2500);
-        }
-    });
-</script>
-</body>
+        <!-- Таблица результатов -->
+        <div class="results">
+            <h:panelGroup rendered="#{not empty pointBean.lastPoint}">
+                <table aria-label="Результаты попадания">
+                    <thead>
+                    <tr>
+                        <th style="text-align:center">Результат</th>
+                        <th style="text-align:center">X</th>
+                        <th style="text-align:center">Y</th>
+                        <th style="text-align:center">R</th>
+                        <th style="text-align:center">Время работы</th>
+                        <th style="text-align:center">Время запроса</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr class="#{pointBean.lastPoint.result ? 'hit' : 'miss'}">
+                        <td><h:outputText value="#{pointBean.lastPoint.resultText}" /></td>
+                        <td><h:outputText value="#{pointBean.lastPoint.x}" /></td>
+                        <td><h:outputText value="#{pointBean.lastPoint.y}" /></td>
+                        <td><h:outputText value="#{pointBean.lastPoint.r}" /></td>
+                        <td>
+                            <h:outputText value="#{pointBean.lastPoint.execTimeMs}">
+                                <f:convertNumber maxFractionDigits="3" />
+                            </h:outputText>
+                            мс
+                        </td>
+                        <td>
+                            <h:outputText value="#{pointBean.lastPoint.formattedTimestamp}" />
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </h:panelGroup>
+
+            <div style="margin-top:16px">
+                <h:link outcome="/index" style="color:#F4EDE3;text-decoration:underline">
+                    Вернуться к форме
+                </h:link>
+            </div>
+        </div>
+    </main>
+
+    <script type="text/javascript">
+        window.addEventListener("DOMContentLoaded", () => {
+            const stage = document.querySelector(".stage");
+            const isHit = "#{empty pointBean.lastPoint ? false : pointBean.lastPoint.result}" === "true";
+
+            if (isHit) {
+                setTimeout(() => stage.classList.add("is-playing"), 300);
+            } else {
+                stage.classList.remove("is-playing");
+                setTimeout(() => stage.classList.add("is-playing"), 300);
+                setTimeout(() => stage.classList.add("is-moving"), 2500);
+            }
+        });
+    </script>
+</h:body>
 </html>

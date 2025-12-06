@@ -1,0 +1,482 @@
+@charset "UTF-8";
+/* Данный SCSS файл предназначен для визуализации и анимации перехода кругов
+*  в различимые буквы H, I, T. Изначально разработан для Лабораторной №2 дисциплины Web-программирование,
+*  изучаемая в "НИУ ИТМО" г. Санкт-Петербург, 2025
+*/
+@font-face {
+    font-family: "Random Grotesque";
+    src: url("../fonts/RG-SpaciousBook.ttf") format("opentype");
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: "Advaken Sans";
+    src: url("../fonts/Advaken Sans.otf") format("opentype");
+    font-weight: normal;
+    font-style: normal;
+}
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+}
+
+/* Важно! Цвет любых стиралок и background должен быть
+*  одинаковым, иначе не будет достигнут эффект "букв" */
+body {
+    margin: 0;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    background: #212121;
+    color: #111;
+}
+
+.stage {
+    min-height: 100dvh;
+    display: grid;
+    place-items: center;
+    gap: 24px;
+    padding: 24px;
+    background: #212121;
+}
+
+.stage {
+    --eraser: #212121;
+}
+
+.word {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: max-content;
+    gap: 32px; /* расстояние между кругами */
+    align-items: center;
+    transform-origin: 0 0;
+}
+
+.circle {
+    width: 360px;
+    height: 360px;
+    background: #46973f;
+    border-radius: 50%;
+    position: relative;
+    overflow: hidden;
+}
+
+.spec-circle--x {
+    width: 360px;
+    height: 360px;
+    position: relative;
+    overflow: hidden;
+    translate: 0 20%;
+    background: transparent;
+    transform-origin: 0 0;
+}
+
+.spec-rect--x {
+    x: 0;
+    y: 0;
+    fill: #9f3333;
+    mask: url(#x-cut);
+}
+
+.miss-text {
+    font-family: Arial Black, serif;
+    text-align: center;
+    font-size: 39pt;
+    color: #9f3333;
+    grid-column: 1/2;
+    grid-row: 2/3;
+    translate: 0 120%;
+    transform-orgin: 0, -30%;
+    opacity: 0;
+}
+
+.t-handles {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.x-handles {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.t-rect {
+    fill: var(--eraser);
+    /* ниже — чтобы трансформации были предсказуемыми */
+    transform-box: fill-box;
+    transform-origin: 50% 50%;
+}
+.t-rect--left {
+    transform-origin: 100% 50%;
+}
+.t-rect--right {
+    transform-origin: 0 50%;
+}
+
+.x-triangle {
+    fill: var(--eraser);
+    transform-box: fill-box;
+    stroke: none;
+}
+.x-triangle--top {
+    fill: white;
+    transform-origin: 50% -300%;
+    opacity: 0;
+}
+.x-triangle--right {
+    transform-origin: -300% 50%;
+    opacity: 0;
+    fill: white;
+}
+.x-triangle--bottom {
+    transform-origin: 50% 300%;
+    opacity: 0;
+    fill: white;
+}
+.x-triangle--left {
+    transform-origin: 300% 50%;
+    opacity: 0;
+    fill: white;
+}
+
+.handle {
+    width: 30px;
+    height: 30px;
+    background: #212121;
+    border-radius: 50%;
+    position: absolute;
+    transform: translate(-50%, -50%) scale(1);
+    will-change: transform, border-radius;
+}
+.handle--top {
+    top: 10dvh;
+    left: 50%;
+    transform-origin: 50% 100%;
+}
+.handle--bottom {
+    bottom: 10dvh;
+    left: 50%;
+    transform-origin: 50% 0;
+    transform: translate(-50%, 50%) scale(1);
+}
+.handle--left {
+    left: 10dvh;
+    top: 50%;
+    transform: translate(-50%, -50%) scale(1);
+    transform-origin: 100% 50%; /* якорь справа — растёт влево при будущем scale */
+}
+.handle--right {
+    right: 10dvh;
+    top: 50%;
+    transform: translate(50%, -50%) scale(1);
+    transform-origin: 0 50%; /* якорь слева — растёт вправо при будущем scale */
+}
+.handle--t-left {
+    left: 10dvh;
+    top: 75%;
+    transform: translate(-50%, -50%) scale(1);
+    transform-origin: 100% 50%;
+}
+.handle--t-right {
+    right: 10dvh;
+    top: 75%;
+    transform: translate(50%, -50%) scale(1);
+    transform-origin: 0 50%;
+}
+
+.results {
+    display: grid;
+    gap: 16px;
+    color: #F4EDE3;
+    width: 90%;
+    translate: 0 -40%;
+    transform-origin: 0 0;
+    opacity: 0;
+}
+
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    overflow: hidden;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    background: transparent;
+    font-family: "Random Grotesque", serif;
+}
+
+thead th {
+    text-align: left;
+    padding: 12px 14px;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    background: transparent;
+    border-bottom: 1px solid #e5e7eb;
+    border-left: 1px solid #e5e7eb;
+    font-family: "Advaken Sans", serif;
+}
+
+tbody td {
+    padding: 12px 14px;
+    border-top: 1px solid #e5e7eb;
+    text-align: center;
+    border-left: 1px solid #e5e7eb;
+}
+
+tr.hit {
+    background: rgba(34, 197, 94, 0.1254901961);
+}
+
+tr.miss {
+    background: rgba(239, 68, 68, 0.1254901961);
+}
+
+@keyframes circle-to-square {
+    from {
+        border-radius: 50%;
+    }
+    to {
+        border-radius: 0;
+    }
+}
+@keyframes circle-to-square--x {
+    from {
+        rx: 50px;
+    }
+    to {
+        rx: 0;
+    }
+}
+@keyframes handle-grow-top {
+    from {
+        transform: translate(-50%, -50%) scale(1);
+    }
+    to {
+        transform: translate(-50%, -60%) scale(6.2);
+    }
+}
+@keyframes handle-grow-bottom {
+    from {
+        transform: translate(-50%, 50%) scale(1);
+    }
+    to {
+        transform: translate(-50%, 60%) scale(6.2);
+    }
+}
+@keyframes handle-to-square {
+    from {
+        border-radius: 50%;
+    }
+    to {
+        border-radius: 0;
+    }
+}
+@keyframes handle-grow-left {
+    from {
+        transform: translate(-50%, -50%) scale(1, 1);
+    }
+    to {
+        transform: translate(-10%, -50%) scale(6.2, 6.2);
+    }
+}
+@keyframes handle-grow-right {
+    from {
+        transform: translate(50%, -50%) scale(1, 1);
+    }
+    to {
+        transform: translate(10%, -50%) scale(6.2, 6.2);
+    }
+}
+/* рост: «круглый прямоугольник» увеличивается равномерно (векторно через svg, позорный костыль для T) */
+@keyframes t-grow-svg {
+    from {
+        transform: scale(1, 1);
+    }
+    to {
+        transform: scale(7, 10.7);
+    }
+}
+@keyframes t-round-to-rect {
+    from {
+        rx: 6px;
+    }
+    to {
+        rx: 0;
+    }
+}
+@keyframes t-grow-x {
+    from {
+        transform: scale(1, 1);
+    }
+    to {
+        transform: scale(7, 10.7);
+    }
+}
+@keyframes x-move {
+    from {
+        transform: translateY(0%);
+    }
+    to {
+        transform: translateY(-10%);
+    }
+}
+@keyframes miss-move {
+    from {
+        transform: translateY(-200%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(-80%);
+        opacity: 1;
+    }
+}
+@keyframes move-tr-t {
+    from {
+        transform: translate(50%, -300%);
+        fill: white;
+        opacity: 0;
+    }
+    to {
+        transform: translate(50%, 0%);
+        fill: black;
+        opacity: 1;
+    }
+}
+@keyframes move-tr-r {
+    from {
+        transform: translate(-300%, 50%);
+        fill: white;
+        opacity: 0;
+    }
+    to {
+        transform: translate(0%, 50%);
+        fill: black;
+        opacity: 1;
+    }
+}
+@keyframes move-tr-b {
+    from {
+        transform: translate(50%, 300%);
+        fill: white;
+        opacity: 0;
+    }
+    to {
+        transform: translate(50%, 100%);
+        fill: black;
+        opacity: 1;
+    }
+}
+@keyframes move-tr-l {
+    from {
+        transform: translate(300%, 50%);
+        fill: white;
+        opacity: 0;
+    }
+    to {
+        transform: translate(100%, 50%);
+        fill: black;
+        opacity: 1;
+    }
+}
+@keyframes move-word {
+    from {
+        transform: translate(0%, 0%);
+    }
+    to {
+        transform: translate(0%, -10%);
+    }
+}
+@keyframes move-results {
+    from {
+        transform: translate(0, 0);
+        opacity: 0;
+    }
+    to {
+        transform: translate(0%, -60%);
+        opacity: 1;
+    }
+}
+.stage.is-playing .circle--h {
+    animation: circle-to-square 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+.stage.is-playing .circle--h .handle--top {
+    animation: handle-grow-top 1.1s cubic-bezier(0.4, 0, 0.2, 1) forwards, handle-to-square 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    animation-delay: 0.8s, 0.8s;
+}
+.stage.is-playing .circle--h .handle--bottom {
+    animation: handle-grow-bottom 1.1s cubic-bezier(0.4, 0, 0.2, 1) forwards, handle-to-square 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    animation-delay: 0.8s, 0.8s;
+}
+.stage.is-playing .circle--i {
+    animation: circle-to-square 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+.stage.is-playing .circle--i .handle--left {
+    animation: handle-grow-left 1.1s cubic-bezier(0.4, 0, 0.2, 1) forwards, handle-to-square 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    animation-delay: 0.8s, 0.8s;
+}
+.stage.is-playing .circle--i .handle--right {
+    animation: handle-grow-right 1.1s cubic-bezier(0.4, 0, 0.2, 1) forwards, handle-to-square 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    animation-delay: 0.8s, 0.8s;
+}
+.stage.is-playing .circle--t {
+    animation: circle-to-square 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+.stage.is-playing .circle--t .t-rect--left,
+.stage.is-playing .circle--t .t-rect--right {
+    animation: t-grow-x 1.1s cubic-bezier(0.4, 0, 0.2, 1) forwards, t-round-to-rect 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    animation-delay: 0.8s, 0.8s;
+}
+.stage.is-playing .rect-mask--x {
+    animation: circle-to-square--x 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    animation-delay: 1.3s;
+}
+.stage.is-playing .x-triangle--top {
+    animation: move-tr-t 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+.stage.is-playing .x-triangle--bottom {
+    animation: move-tr-b 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+.stage.is-playing .x-triangle--right {
+    animation: move-tr-r 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+.stage.is-playing .x-triangle--left {
+    animation: move-tr-l 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+.stage.is-playing .word {
+    animation: move-word 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    animation-delay: 2s;
+}
+.stage.is-playing .results {
+    animation: move-results 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    animation-delay: 2s;
+}
+
+.stage.is-moving .spec-circle--x {
+    animation: x-move 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+.stage.is-moving .miss-text {
+    animation: miss-move 1.2s cubic-bezier(0.4, 0.1, 0.4, 1) forwards;
+    animation-delay: 0s;
+}
+
+@media (max-width: 480px) {
+    .circle {
+        width: 260px;
+        height: 260px;
+    }
+    .handle {
+        width: 22px;
+        height: 22px;
+    }
+}
