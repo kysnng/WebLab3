@@ -1,0 +1,139 @@
+/* Страница с часами поверх базового style.css */
+.clock-page{
+    display:flex;
+    justify-content:center;
+    align-items: center;
+    flex-direction: column;
+    margin-top: 60px;
+}
+
+.clock-wrap{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content: center;
+    width: 100%;
+}
+
+/* Сам циферблат */
+.clock{
+    position:relative;
+    flex-shrink: 0;
+    height: auto !important;
+    width:min(520px, 80vmin);
+    aspect-ratio:1 / 1;
+    border-radius:50%;
+    margin-inline:auto;
+    background: #1C254200;
+    box-shadow:
+            0 24px 60px rgba(0,0,0,.8),
+            inset 0 0 0 18px #f4f5f7;
+}
+
+/* маленькая точка в центре */
+.mark{
+    position:absolute;
+    left:50%;
+    top:50%;
+    width:10px;
+    height:10px;
+    transform:translate(-50%, -50%);
+    background:#f4f5f7;
+    border-radius:50%;
+    z-index:6;
+}
+
+/* Стрелки */
+.hand{
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform-origin:50% 100%;
+    transform:translate(-50%, -100%) rotate(0deg);
+    border-radius:999px;
+    background:#f4f5f7;
+    z-index:5;
+}
+
+.hand.hour{
+    width:12px;
+    height:14%;
+}
+
+.hand.minute{
+    width:12px;
+    height:20%;
+    opacity:.95;
+}
+
+.hand.second{
+    width:6px;
+    height:28%;
+    opacity:.65;
+}
+
+/* круглая «шляпка» в центре */
+.stem{
+    position:absolute;
+    left:50%;
+    top:50%;
+    width:22px;
+    height:22px;
+    transform:translate(-50%, -50%);
+    background:#f4f5f7;
+    border-radius:50%;
+    box-shadow:0 0 0 6px rgba(0,0,0,.3) inset;
+    z-index:7;
+}
+
+/* Цифры по кругу */
+.num{
+    --angle: 0deg;
+    position:absolute;
+    left:50%;
+    top:50%;
+    /* делаем круг для цифр чуть меньше циферблата */
+    width:82%;
+    height:82%;
+    transform:translate(-50%, -50%) rotate(var(--angle));
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    pointer-events:none;
+    font-family: "Advaken Sans", serif;
+    font-weight:400;
+    color:#f4f5f7;
+}
+
+.num span{
+    font-size:clamp(20px, 4.5vmin, 50px);
+    transform:rotate(calc(-1 * var(--angle))) translateY(-8%);
+}
+
+/* углы для каждой цифры */
+.n12{ --angle:   0deg; }
+.n1 { --angle:  30deg; }
+.n2 { --angle:  60deg; }
+.n3 { --angle:  90deg; }
+.n4 { --angle: 120deg; }
+.n5 { --angle: 150deg; }
+.n6 { --angle: 180deg; }
+.n7 { --angle: 210deg; }
+.n8 { --angle: 240deg; }
+.n9 { --angle: 270deg; }
+.n10{ --angle: 300deg; }
+.n11{ --angle: 330deg; }
+
+/* Кнопка перехода — слегка подчёркиваем */
+.btn.btn-primary{
+    border:1px solid #d9d9d9;
+    padding:10px 3px;
+    width: 30%;
+    text-align: center;
+    margin-top: 120px;
+    margin-bottom: 100px;
+    border-radius:24px;
+    font-size:20px;
+    letter-spacing:1px;
+    text-decoration:none;
+}

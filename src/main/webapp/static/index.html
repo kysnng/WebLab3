@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <title>Лабораторная работа №2</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/main.js" defer></script>
+</head>
+<body>
+<div class="container">
+    <!-- Header -->
+    <header class="header">
+        <h1 class="header__title">Лабораторная работа 2</h1>
+        <p class="header__meta">
+            <span><strong>ФИО:</strong> Соловьев Даниил Дмитриевич</span>
+            <span><strong>Группа:</strong> Р3222</span>
+            <span><strong>ИСУ:</strong> 467550</span>
+        </p>
+    </header>
+
+    <!-- Main -->
+    <main class="grid">
+        <!-- Graph -->
+        <section class="card">
+            <h2 class="card__title">График</h2>
+            <div>
+            <canvas id="graph" width="600" height="600"></canvas>
+            </div>
+        </section>
+
+        <!-- Parameters -->
+        <section class="card">
+            <h2 class="card__title">Параметры</h2>
+
+            <form class="form" action="#" method="post">
+                <!-- X -->
+                <div class="field">
+                    <label class="label">Координата X:</label>
+                    <select id="x-select" class="x-row" name="x" aria-label="Выбор X" required>
+                        <!-- дискретные X как в референсе: -2 … 3 -->
+                        <option value="" selected disabled>Выбери X</option>
+                        <option value="-2">-2</option>
+                        <option value="-1.5">-1.5</option>
+                        <option value="-1">-1</option>
+                        <option value="-0.5">-0.5</option>
+                        <option value="0">0</option>
+                        <option value="0.5">0.5</option>
+                        <option value="1">1</option>
+                        <option value="1.5">1.5</option>
+                        <option value="2">2</option>
+                    </select>
+                </div>
+
+                <!-- Y -->
+                <div class="field">
+                    <label for="y" class="label">Координата Y:</label>
+                    <input id="y" name="y" class="input" type="text" placeholder="Введите Y от -5 до 5" />
+                </div>
+
+                <!-- R -->
+                <div class="field">
+                    <label class="label">Координата R:</label>
+                    <div class="row" role="group" aria-label="Выбор R">
+                        <label class="chip">1<input type="radio" name="r" value="1"></label>
+                        <label class="chip">1.5<input type="radio" name="r" value="1.5"></label>
+                        <label class="chip">2<input type="radio" name="r" value="2"></label>
+                        <label class="chip">2.5<input type="radio" name="r" value="2.5"></label>
+                        <label class="chip">3<input type="radio" name="r" value="3"></label>
+                    </div>
+                </div>
+
+                <!-- Action -->
+                <div class="actions">
+                    <button class="btn" type="submit">ПРОВЕРИТЬ ТОЧКУ</button>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <!-- Results -->
+    <section class="card" style="margin-top:24px">
+        <h2 class="card__title">Результаты</h2>
+
+        <div class="results">
+            <table aria-label="История попаданий" >
+                <thead>
+                <tr>
+                    <th style="text-align:center">Попадания</th>
+                    <th style="text-align:center">X</th>
+                    <th style="text-align:center">Y</th>
+                    <th style="text-align:center">R</th>
+                </tr>
+                </thead>
+                <tbody id="results-body">
+                <!-- Примеры строк (удали при интеграции) -->
+                <tr class="hit">
+                    <td style>Тест попадания</td>
+                    <td>1</td>
+                    <td>0.5</td>
+                    <td>2</td>
+                </tr>
+                <tr class="miss">
+                    <td>Тест промаха</td>
+                    <td>-2</td>
+                    <td>2.3</td>
+                    <td>2.5</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+</body>
+</html>
