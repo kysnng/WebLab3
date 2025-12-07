@@ -12,8 +12,8 @@ class AreaCheckBean : Serializable {
     fun checkPoint(x: Double, y: Double, r: Double): PointCheck {
         val result = when {
             x >= 0 && y >= 0 -> checkCircle(x, y, r)
-            x >= 0 && y <= 0 -> checkRectangle(x, y, r)
-            x >= 0 && y >= 0 -> checkTriangle(x, y, r)
+            x <= 0 && y <= 0 -> checkRectangle(x, y, r)
+            x <= 0 && y >= 0 -> checkTriangle(x, y, r)
             else -> false
         }
         return PointCheck(x, y, r, result)

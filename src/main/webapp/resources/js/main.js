@@ -143,28 +143,41 @@ function getClickCoordinates(evt, R) {
 }
 
 async function checkHit(x, y, R) {
-    const body = new URLSearchParams({ x: x.toFixed(3), y: y.toFixed(3), r: R.toString() });
-    const url = "controller";
+    const params = new URLSearchParams({
+        x: x.toFixed(3),
+        y: y.toFixed(3),
+        r: R.toString()
+    });
+
+    // /webLab3/index.xhtml -> /webLab3/api/point
+    const parts = window.location.pathname.split("/");
+    const context = parts.length > 1 ? "/" + parts[1] : "";
+    const url = context + "/api/point";
+
     const resp = await fetch(url, {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded", "X-Requested-With": "XMLHttpRequest" },
-        body
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-Requested-With": "XMLHttpRequest"
+        },
+        body: params.toString()
     });
+
     if (!resp.ok) {
         const text = await resp.text();
         console.error("Bad request:", resp.status, text);
         throw new Error("Bad request");
     }
-    const ct = resp.headers.get("content-type") || "";
-    if (!ct.includes("application/json")) {
-        const text = await resp.text();
-        console.error("Expected JSON, got:", ct, text.slice(0, 500));
-        throw new Error("Non-JSON response");
+
+    const text = await resp.text();
+    try {
+        return JSON.parse(text);
+    } catch (e) {
+        console.error("JSON parse error. Raw response:", text);
+        throw e;
     }
-    const json = await resp.json();
-    if (json.error) throw new Error(json.error);
-    return json;
 }
+
 
 canvas.addEventListener("click", async (evt) => {
     try {

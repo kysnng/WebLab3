@@ -2,6 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="jakarta.faces.html"
       xmlns:f="jakarta.faces.core"
+      xmlns:ui="jakarta.faces.facelets"
       xmlns:svg="http://www.w3.org/2000/svg"
       lang="ru">
 
@@ -13,39 +14,58 @@
                 value="#{empty pointBean.lastPoint ? '—' : pointBean.lastPoint.resultText}"/>
     </title>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <h:outputStylesheet library="css" name="style.css"/>
     <h:outputStylesheet library="css" name="result.css"/>
+    <style type="text/css">
+        @font-face {
+            font-family: "Advaken Sans";
+            src: url("#{resource['fonts:AdvakenSans.otf']}") format("opentype");
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: "Random Grotesque";
+            src: url("#{resource['fonts:RG-SpaciousBook.ttf']}") format("opentype");
+            font-weight: normal;
+            font-style: normal;
+        }
+    </style>
 </h:head>
 
 <h:body>
     <main class="stage">
         <div class="word">
-            <!-- Вариант HIT -->
-            <h:panelGroup rendered="#{not empty pointBean.lastPoint and pointBean.lastPoint.result}">
+            <!-- Вариант HIT (рендерим H I T) -->
+            <ui:fragment rendered="#{not empty pointBean.lastPoint and pointBean.lastPoint.result}">
+                <!-- H -->
                 <div class="circle circle--h">
                     <div class="handle handle--top"></div>
                     <div class="handle handle--bottom"></div>
                 </div>
 
+                <!-- I -->
                 <div class="circle circle--i">
                     <div class="handle handle--left"></div>
                     <div class="handle handle--right"></div>
                 </div>
 
+                <!-- T -->
                 <div class="circle circle--t">
                     <svg:svg class="t-handles" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+                        <!-- ЛЕВАЯ -->
                         <svg:g class="t-node t-node--left" transform="translate(28.5, 75)">
                             <svg:rect class="t-rect t-rect--left" x="-7" y="-7" width="9" height="9" rx="7"/>
                         </svg:g>
+                        <!-- ПРАВАЯ -->
                         <svg:g class="t-node t-node--right" transform="translate(77.5, 75)">
                             <svg:rect class="t-rect t-rect--right" x="-7" y="-7" width="9" height="9" rx="7"/>
                         </svg:g>
                     </svg:svg>
                 </div>
-            </h:panelGroup>
+            </ui:fragment>
 
-            <!-- Вариант MISS -->
-            <h:panelGroup rendered="#{not empty pointBean.lastPoint and not pointBean.lastPoint.result}">
+            <!-- Вариант MISS (круг-крест + текст MISS) -->
+            <ui:fragment rendered="#{not empty pointBean.lastPoint and not pointBean.lastPoint.result}">
                 <div class="spec-circle--x">
                     <svg:svg class="x-handles" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
                         <svg:defs>
@@ -72,7 +92,7 @@
                     </svg:svg>
                 </div>
                 <div class="miss-text">MISS</div>
-            </h:panelGroup>
+            </ui:fragment>
         </div>
 
         <!-- Таблица результатов -->
@@ -91,19 +111,17 @@
                     </thead>
                     <tbody>
                     <tr class="#{pointBean.lastPoint.result ? 'hit' : 'miss'}">
-                        <td><h:outputText value="#{pointBean.lastPoint.resultText}" /></td>
-                        <td><h:outputText value="#{pointBean.lastPoint.x}" /></td>
-                        <td><h:outputText value="#{pointBean.lastPoint.y}" /></td>
-                        <td><h:outputText value="#{pointBean.lastPoint.r}" /></td>
+                        <td><h:outputText value="#{pointBean.lastPoint.resultText}"/></td>
+                        <td><h:outputText value="#{pointBean.lastPoint.x}"/></td>
+                        <td><h:outputText value="#{pointBean.lastPoint.y}"/></td>
+                        <td><h:outputText value="#{pointBean.lastPoint.r}"/></td>
                         <td>
                             <h:outputText value="#{pointBean.lastPoint.execTimeMs}">
-                                <f:convertNumber maxFractionDigits="3" />
+                                <f:convertNumber maxFractionDigits="3"/>
                             </h:outputText>
                             мс
                         </td>
-                        <td>
-                            <h:outputText value="#{pointBean.lastPoint.formattedTimestamp}" />
-                        </td>
+                        <td><h:outputText value="#{pointBean.lastPoint.formattedTimestamp}"/></td>
                     </tr>
                     </tbody>
                 </table>
@@ -118,16 +136,22 @@
     </main>
 
     <script type="text/javascript">
-        window.addEventListener("DOMContentLoaded", () => {
+        window.addEventListener("DOMContentLoaded", function () {
             const stage = document.querySelector(".stage");
-            const isHit = "#{empty pointBean.lastPoint ? false : pointBean.lastPoint.result}" === "true";
+            const isHit = "#{empty pointBean.lastPoint ? 'false' : (pointBean.lastPoint.result ? 'true' : 'false')}" === "true";
 
             if (isHit) {
-                setTimeout(() => stage.classList.add("is-playing"), 300);
+                setTimeout(function () {
+                    stage.classList.add("is-playing");
+                }, 300);
             } else {
                 stage.classList.remove("is-playing");
-                setTimeout(() => stage.classList.add("is-playing"), 300);
-                setTimeout(() => stage.classList.add("is-moving"), 2500);
+                setTimeout(function () {
+                    stage.classList.add("is-playing");
+                }, 300);
+                setTimeout(function () {
+                    stage.classList.add("is-moving");
+                }, 2500);
             }
         });
     </script>

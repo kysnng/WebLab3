@@ -1,6 +1,6 @@
 package org.example.beans
 
-import jakarta.faces.view.ViewScoped
+import jakarta.enterprise.context.SessionScoped
 import jakarta.inject.Inject
 import jakarta.inject.Named
 import org.example.models.PointCheck
@@ -9,7 +9,7 @@ import org.example.beans.AreaCheckBean
 import java.io.Serializable
 
 @Named
-@ViewScoped
+@SessionScoped
 class PointBean : Serializable {
     var x: String = ""
     var y: String = ""
@@ -44,7 +44,7 @@ class PointBean : Serializable {
         lastPoint = pointCheck
         error = null
 
-        return null
+        return "result?faces-redirect=true"
     }
 
     fun getResults(): List<PointCheck> = resultBean.all()
