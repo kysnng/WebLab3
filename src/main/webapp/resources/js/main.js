@@ -66,13 +66,13 @@ function appendResultRow(json) {
     const tr = document.createElement('tr');
     tr.className = json.hit ? 'hit' : 'miss';
     tr.innerHTML = `
-    <td>${json.hit ? 'Попадание' : 'Промах'}</td>
-    <td>${Number(json.x).toFixed(3)}</td>
-    <td>${Number(json.y).toFixed(3)}</td>
-    <td>${json.r}</td>
-    <td>${(Number(json.execMs) || 0).toFixed(3)}</td>
-    <td>${json.timestamp || ''}</td>
-  `;
+      <td>${json.hit ? 'Попадание' : 'Промах'}</td>
+      <td>${Number(json.x).toFixed(3)}</td>
+      <td>${Number(json.y).toFixed(3)}</td>
+      <td>${json.r}</td>
+      <td>${(Number(json.execMs) || 0).toFixed(3)} мс</td>
+      <td>${json.timestamp || ''}</td>
+    `;
     resultsBody.appendChild(tr);
 }
 
@@ -111,15 +111,15 @@ function drawGraph(R = 1) {
     ctx.fillText("Y", 310, 10);
 
     ctx.fillStyle = "rgba(0,255,84,0.14)";
-    ctx.fillRect(500 - scale * R, 300, scale*R, scale*R);
+    ctx.fillRect(300 - scale * R, 300, scale*R, scale*0.5*R);
 
     ctx.fillStyle = "rgba(0,60,255,0.15)";
-    ctx.beginPath(); ctx.moveTo(300,300); ctx.lineTo(100+scale*R,200); ctx.lineTo(500,100+scale*R);
+    ctx.beginPath(); ctx.moveTo(200,300); ctx.lineTo(100+scale*R,200); ctx.lineTo(300,100+scale*R);
     ctx.closePath(); ctx.fill();
 
     ctx.fillStyle = "rgba(255,0,0,0.16)";
     ctx.beginPath(); ctx.moveTo(300,300);
-    ctx.arc(300,300, scale*R/2, Math.PI, Math.PI*1.5, false);
+    ctx.arc(300,300, scale*R, Math.PI*-0.5, Math.PI*-2, false);
     ctx.closePath(); ctx.fill();
 
     for (let p of points) {

@@ -1,50 +1,41 @@
 package org.example.models
 
-import jakarta.enterprise.context.SessionScoped
+import jakarta.enterprise.context.ApplicationScoped
 import jakarta.inject.Inject
 import jakarta.inject.Named
 import org.example.entities.ResultEntity
 import org.example.repositories.ResultRepository
 import java.io.Serializable
-import java.time.LocalDateTime
-import java.util.Collections
 
 @Named
-@SessionScoped
- class ResultBean : Serializable {
+@ApplicationScoped
+class ResultBean : Serializable {
 
     @Inject
     private lateinit var resultRepository: ResultRepository
 
-    private var cache: MutableList<PointCheck> = mutableListOf()
+    // Берём последние N точек прямо из БД
+    fun all(limit: Int = 20): List<PointCheck> =
+        resultRepository.findLast(limit).map { it.toPointCheck() }
 
-    @jakarta.annotation.PostConstruct
-    fun init(){
-        cache = resultRepository.findLast(20)
-            .map{it.toPointCheck()}
-            .toMutableList()
-    }
-
+    // Для обычной формы (submit из JSF)
     fun add(point: PointCheck) {
-        cache.add(0, point)
         resultRepository.saveFromPoint(point)
     }
 
-    fun all(): List<PointCheck>  = cache
-
-    fun trimTo(max: Int) {
-        if (cache.size > max) {
-            cache = cache.take(max).toMutableList()
-        }
+    // На будущее, если где-то вызывается
+    fun trimTo(limit: Int) {
+        // можно ничего не делать, т.к. all(limit) и так режет
     }
-
-    private fun ResultEntity.toPointCheck(): PointCheck =
-        PointCheck(
-            x = this.x,
-            y = this.y,
-            r = this.r,
-            result = this.hit,
-            execTimeMs = this.execMs,
-            timestamp = this.ts ?: LocalDateTime.now(),
-        )
 }
+
+// маппер сущности в PointCheck
+fun ResultEntity.toPointCheck(): PointCheck =
+    PointCheck(
+        x = this.x,
+        y = this.y,
+        r = this.r,
+        result = this.hit,
+        execTimeMs = this.execMs,
+        timestamp = this.ts
+    )

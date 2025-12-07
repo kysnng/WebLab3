@@ -32,8 +32,8 @@ class AreaCheckBean : Serializable {
     }
 
     fun validateInputStrings(xStr: String, yStr: String, rStr: String): Boolean {
-        val x = parseWithScaleLimit(xStr, min = -3.0, max = 3.0, maxScale = 3) ?: return false
-        val y = parseWithScaleLimit(yStr, min = -3.0, max = 3.0, maxScale = 3) ?: return false
+        val x = parseWithScaleLimit(xStr, min = -5.0, max = 5.0, maxScale = 3) ?: return false
+        val y = parseWithScaleLimit(yStr, min = -5.0, max = 5.0, maxScale = 3) ?: return false
         val r = parseWithScaleLimit(rStr, min = 1.0, max = 3.0, maxScale = 3) ?: return false
         return true
     }
