@@ -1,26 +1,50 @@
 package org.example.models
 
 import jakarta.enterprise.context.SessionScoped
+import jakarta.inject.Inject
 import jakarta.inject.Named
+import org.example.entities.ResultEntity
+import org.example.repositories.ResultRepository
 import java.io.Serializable
+import java.time.LocalDateTime
 import java.util.Collections
 
 @Named
 @SessionScoped
-open class ResultBean : Serializable {
-    private val results = mutableListOf<PointCheck>()
+ class ResultBean : Serializable {
 
-    fun add(item: PointCheck) {
-        results.add(item)
+    @Inject
+    private lateinit var resultRepository: ResultRepository
+
+    private var cache: MutableList<PointCheck> = mutableListOf()
+
+    @jakarta.annotation.PostConstruct
+    fun init(){
+        cache = resultRepository.findLast(20)
+            .map{it.toPointCheck()}
+            .toMutableList()
     }
 
-    fun all(): List<PointCheck> = Collections.unmodifiableList(results)
+    fun add(point: PointCheck) {
+        cache.add(0, point)
+        resultRepository.saveFromPoint(point)
+    }
+
+    fun all(): List<PointCheck>  = cache
 
     fun trimTo(max: Int) {
-        if (results.size > max) repeat(results.size - max) { results.removeAt(0) }
+        if (cache.size > max) {
+            cache = cache.take(max).toMutableList()
+        }
     }
 
-    fun clear() {
-        results.clear()
-    }
+    private fun ResultEntity.toPointCheck(): PointCheck =
+        PointCheck(
+            x = this.x,
+            y = this.y,
+            r = this.r,
+            result = this.hit,
+            execTimeMs = this.execMs,
+            timestamp = this.ts ?: LocalDateTime.now(),
+        )
 }

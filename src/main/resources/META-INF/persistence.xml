@@ -5,19 +5,26 @@
 
     <persistence-unit name="labPU" transaction-type="RESOURCE_LOCAL">
 
+        <!-- EclipseLink подрубаем ау -->
+        <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+
         <class>org.example.entities.ResultEntity</class>
 
         <properties>
-            <!-- JDBC-настройки H2 -->
+            <!-- Настройки H2 -->
             <property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver"/>
             <property name="jakarta.persistence.jdbc.url"
                       value="jdbc:h2:mem:labdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE"/>
             <property name="jakarta.persistence.jdbc.user" value="sa"/>
             <property name="jakarta.persistence.jdbc.password" value=""/>
 
-            <!-- Автосоздание схемы -->
+            <!-- Схема -->
             <property name="jakarta.persistence.schema-generation.database.action"
                       value="create"/>
+
+            <!-- для EclipseLink -->
+            <property name="eclipselink.ddl-generation" value="create-or-extend-tables"/>
+            <property name="eclipselink.logging.level" value="FINE"/>
         </properties>
     </persistence-unit>
 </persistence>

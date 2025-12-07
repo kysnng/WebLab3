@@ -5,7 +5,7 @@ import jakarta.inject.Inject
 import jakarta.inject.Named
 import org.example.models.PointCheck
 import org.example.models.ResultBean
-import org.example.services.AreaCheckBean
+import org.example.beans.AreaCheckBean
 import java.io.Serializable
 
 @Named

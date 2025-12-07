@@ -2,64 +2,64 @@ const canvas = document.getElementById("graph");
 const ctx = canvas.getContext("2d");
 let points = [];
 
-/* ---------- R ---------- */
 function getSelectedR() {
-    const checked = document.querySelector('input[name="r"]:checked');
+    const checked = document.querySelector('#r-chips input[name="r-chip"]:checked');
     return checked ? parseFloat(checked.value) : null;
 }
 
-/* ---------- X (select) ---------- */
-let selectedX = null;
-const xSelect = document.getElementById('x-select');
-
-function getSelectedX() {
-    if (!xSelect) return null;
-    const v = xSelect.value;
-    return v === "" ? null : parseFloat(v);
-}
-selectedX = getSelectedX();
-if (xSelect) {
-    xSelect.addEventListener('change', () => {
-        selectedX = getSelectedX();
-    });
-}
-
-/* ---------- валидация формы ---------- */
 const form = document.querySelector('form.form');
+const xInput = document.getElementById('x');
 const yInput = document.getElementById('y');
+const rHidden = document.getElementById('r');
 
-function isValidY(yStr) {
-    if (!/^(-?\d+)(\.\d{1,3})?$/.test(yStr.trim())) return false;
-    const y = parseFloat(yStr);
-    return Number.isFinite(y) && y >= -5 && y <= 5;
+function normalizeNumber(str) {
+    const s = str.replace(',', '.').trim();
+    return s;
+}
+
+function isValidCoord(str) {
+    const s = normalizeNumber(str);
+    if (!/^[-+]?\d+(\.\d{1,3})?$/.test(s)) return false;
+    const v = parseFloat(s);
+    return Number.isFinite(v) && v >= -3 && v <= 3;
 }
 
 if (form) {
     form.addEventListener('submit', (e) => {
-        const xVal = getSelectedX();
-        if (xVal === null) { e.preventDefault(); alert("Выбери X"); return; }
+        const xStr = xInput.value;
+        if (!isValidCoord(xStr)) {
+            e.preventDefault();
+            alert("X должен быть числом от -3 до 3, не более 3 знаков после точки");
+            return;
+        }
 
         const yStr = yInput.value;
-        if (!isValidY(yStr)) { e.preventDefault(); alert("Y должен быть числом от -5 до 5, не более 3 знаков после точки"); return; }
+        if (!isValidCoord(yStr)) {
+            e.preventDefault();
+            alert("Y должен быть числом от -3 до 3, не более 3 знаков после точки");
+            return;
+        }
 
         const R = getSelectedR();
-        if (R === null) { e.preventDefault(); alert("Выбери R"); return; }
-
-        yInput.value = (Math.round(parseFloat(yStr) * 1000) / 1000).toFixed(3);
-
-        if (!/\/controller$/.test(form.action)) {
-            const base = window.location.pathname.replace(/\/[^/]*$/, '');
-            form.action = `${base}/controller`;
+        if (R === null) {
+            e.preventDefault();
+            alert("Выбери R");
+            return;
         }
+
+        if (rHidden) rHidden.value = R.toString();
+
+        const xNorm = parseFloat(normalizeNumber(xStr));
+        const yNorm = parseFloat(normalizeNumber(yStr));
+        xInput.value = xNorm.toFixed(3);
+        yInput.value = yNorm.toFixed(3);
     });
 }
 
-/* ---------- таблица: добавление строки ---------- */
 const resultsBody = document.getElementById('results-body');
 
 function appendResultRow(json) {
     if (!resultsBody) return;
-    // убрать плейсхолдер, если есть
     const empty = resultsBody.querySelector('.empty-row');
     if (empty) empty.remove();
 
@@ -76,7 +76,6 @@ function appendResultRow(json) {
     resultsBody.appendChild(tr);
 }
 
-/* ---------- график ---------- */
 function drawGraph(R = 1) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.strokeStyle = "white";
@@ -94,9 +93,7 @@ function drawGraph(R = 1) {
 
     function tick(x1,y1,x2,y2){ ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke(); }
 
-    // OX
     tick(500,305,500,295); tick(400,305,400,295); tick(100,305,100,295); tick(200,305,200,295);
-    // OY
     tick(295,100,305,100); tick(295,200,305,200); tick(295,400,305,400); tick(295,500,305,500);
 
     const scale = 200 / R;
@@ -113,16 +110,13 @@ function drawGraph(R = 1) {
     ctx.fillText("X", 590, 320);
     ctx.fillText("Y", 310, 10);
 
-    // rect
     ctx.fillStyle = "rgba(0,255,84,0.14)";
     ctx.fillRect(500 - scale * R, 300, scale*R, scale*R);
 
-    // triangle
     ctx.fillStyle = "rgba(0,60,255,0.15)";
     ctx.beginPath(); ctx.moveTo(300,300); ctx.lineTo(100+scale*R,200); ctx.lineTo(500,100+scale*R);
     ctx.closePath(); ctx.fill();
 
-    // circle
     ctx.fillStyle = "rgba(255,0,0,0.16)";
     ctx.beginPath(); ctx.moveTo(300,300);
     ctx.arc(300,300, scale*R/2, Math.PI, Math.PI*1.5, false);
@@ -150,7 +144,6 @@ function getClickCoordinates(evt, R) {
 
 async function checkHit(x, y, R) {
     const body = new URLSearchParams({ x: x.toFixed(3), y: y.toFixed(3), r: R.toString() });
-    // const base = window.location.pathname.replace(/\/[^/]*$/, '');
     const url = "controller";
     const resp = await fetch(url, {
         method: "POST",
@@ -170,10 +163,9 @@ async function checkHit(x, y, R) {
     }
     const json = await resp.json();
     if (json.error) throw new Error(json.error);
-    return json; // ВОЗВРАЩАЕМ ВЕСЬ JSON!
+    return json;
 }
 
-/* ---------- события ---------- */
 canvas.addEventListener("click", async (evt) => {
     try {
         const R = getSelectedR();
@@ -185,26 +177,19 @@ canvas.addEventListener("click", async (evt) => {
         const {xVal, yVal} = getClickCoordinates(evt, R);
         const json = await checkHit(xVal, yVal, R);
 
-        // точки на графике
         points.push({x: xVal, y: yVal, hit: json.hit});
         drawGraph(R);
-
-        // строка в таблицу
         appendResultRow(json);
     } catch (e){
         console.error("AJAX/error", e);
-        alert("Не удалось проверить точку. Смотрите детали в консоли.")
+        alert("Не удалось проверить точку. Смотрите детали в консоли.");
     }
 });
 
-document.querySelectorAll('input[name="r"]').forEach(radio => {
+document.querySelectorAll('#r-chips input[name="r-chip"]').forEach(radio => {
     radio.addEventListener("change", async () => {
         const R = parseFloat(radio.value);
-        // переоцениваем статус попадания только визуально (таблицу не трогаем)
-        for (let p of points) {
-            const j = await checkHit(p.x, p.y, R);
-            p.hit = j.hit;
-        }
+        if (rHidden) rHidden.value = radio.value;
         drawGraph(R);
     });
 });

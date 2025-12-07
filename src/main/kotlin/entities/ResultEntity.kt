@@ -1,24 +1,37 @@
 package org.example.entities
 
-import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
-import jakarta.persistence.Table
+import jakarta.persistence.*
 import java.time.LocalDateTime
 
 @Entity
 @Table(name = "hit_results")
 open class ResultEntity(
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "result_seq")
+    @SequenceGenerator(
+        name = "result_seq",
+        sequenceName = "result_seq",
+        allocationSize = 1
+    )
+    @Column(name = "id")
     var id: Long? = null,
+
+    @Column(name = "x", nullable = false)
     var x: Double = 0.0,
+
+    @Column(name = "y", nullable = false)
     var y: Double = 0.0,
+
+    @Column(name = "r", nullable = false)
     var r: Double = 0.0,
+
+    @Column(name = "hit", nullable = false)
     var hit: Boolean = false,
+
+    @Column(name = "execMs", nullable = false)
     var execMs: Double = 0.0,
+
+    @Column(name = "ts", nullable = false)
     var ts: LocalDateTime = LocalDateTime.now()
-) {
-    constructor() : this(null, 0.0, 0.0, 0.0, false, 0.0, LocalDateTime.now())
-}
+)

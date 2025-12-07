@@ -7,7 +7,7 @@ import org.example.models.PointCheck
 import org.example.entities.ResultEntity
 
 @ApplicationScoped
-open class ResultRepository {
+ class ResultRepository {
 
     @PersistenceUnit(unitName = "labPU")
     private lateinit var emf: EntityManagerFactory

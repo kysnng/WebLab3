@@ -10,7 +10,6 @@
     <title>Лабораторная работа №2</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <!-- /context/javax.faces.resource/style.css?ln=css -->
     <h:outputStylesheet library="css" name="style.css" />
     <style type="text/css">
         @font-face {
@@ -32,7 +31,6 @@
 
 <h:body>
     <div class="container">
-        <!-- Header -->
         <header class="header">
             <h1 class="header__title">Лабораторная работа 2</h1>
             <p class="header__meta">
@@ -42,9 +40,7 @@
             </p>
         </header>
 
-        <!-- Main -->
         <main class="grid">
-            <!-- Graph -->
             <section class="card">
                 <h2 class="card__title">График</h2>
                 <div>
@@ -52,47 +48,31 @@
                 </div>
             </section>
 
-            <!-- Parameters -->
             <section class="card">
                 <h2 class="card__title">Параметры</h2>
 
-                <h:form id="pointForm" styleClass="form">
-                    <!-- X -->
+                <h:form id="pointForm" styleClass="form" prependId="false">
                     <div class="field">
-                        <label class="label" for="x-select">Координата X:</label>
-                        <h:selectOneMenu id="x-select"
-                                         value="#{pointBean.x}"
-                                         styleClass="x-row"
-                                         aria-label="Выбор X"
-                                         required="true">
-                            <f:selectItem itemValue="" itemLabel="Выбери X" noSelectionOption="true" />
-                            <f:selectItem itemValue="-2"   itemLabel="-2" />
-                            <f:selectItem itemValue="-1.5" itemLabel="-1.5" />
-                            <f:selectItem itemValue="-1"   itemLabel="-1" />
-                            <f:selectItem itemValue="-0.5" itemLabel="-0.5" />
-                            <f:selectItem itemValue="0"    itemLabel="0" />
-                            <f:selectItem itemValue="0.5"  itemLabel="0.5" />
-                            <f:selectItem itemValue="1"    itemLabel="1" />
-                            <f:selectItem itemValue="1.5"  itemLabel="1.5" />
-                            <f:selectItem itemValue="2"    itemLabel="2" />
-                        </h:selectOneMenu>
+                        <label class="label" for="x">Координата X:</label>
+                        <h:inputText id="x"
+                                     value="#{pointBean.x}"
+                                     styleClass="input"
+                                     maxlength="8"
+                                     placeholder="Введите X от -3 до 3" />
                     </div>
 
-                    <!-- Y -->
                     <div class="field">
                         <label for="y" class="label">Координата Y:</label>
                         <h:inputText id="y"
                                      value="#{pointBean.y}"
                                      styleClass="input"
                                      maxlength="8"
-                                     placeholder="Введите Y от -5 до 5" />
+                                     placeholder="Введите Y от -3 до 3" />
                     </div>
 
-                    <!-- R -->
                     <div class="field">
                         <label class="label">Координата R:</label>
                         <div class="row" role="group" aria-label="Выбор R" id="r-chips">
-                            <!-- Вёрстка как в идеальном HTML -->
                             <label class="chip">
                                 1
                                 <input type="radio" name="r-chip" value="1" />
@@ -115,18 +95,15 @@
                             </label>
                         </div>
 
-                        <!-- Сюда JS будет писать выбранный R, чтобы JSF-бин его получил -->
                         <h:inputHidden id="r" value="#{pointBean.r}" />
                     </div>
 
-                    <!-- Action -->
                     <div class="actions">
                         <h:commandButton value="ПРОВЕРИТЬ ТОЧКУ"
                                          styleClass="btn"
                                          action="#{pointBean.submit}" />
                     </div>
 
-                    <!-- Ошибка -->
                     <h:panelGroup rendered="#{not empty pointBean.error}">
                         <div class="kpi miss" style="margin-top:12px">
                             <h:outputText value="#{pointBean.error}" />
@@ -136,7 +113,6 @@
             </section>
         </main>
 
-        <!-- Results -->
         <section class="card" style="margin-top:24px">
             <h2 class="card__title">Результаты</h2>
 
@@ -151,7 +127,6 @@
                     </tr>
                     </thead>
                     <tbody id="results-body">
-                    <!-- Пусто -->
                     <ui:fragment rendered="#{empty pointBean.results}">
                         <tr class="empty-row">
                             <td colspan="4" style="text-align:center;opacity:.7">
@@ -160,7 +135,6 @@
                         </tr>
                     </ui:fragment>
 
-                    <!-- Есть результаты -->
                     <ui:repeat value="#{pointBean.results}" var="p">
                         <tr class="#{p.result ? 'hit' : 'miss'}">
                             <td><h:outputText value="#{p.resultText}" /></td>
