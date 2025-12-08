@@ -14,22 +14,17 @@ class ResultBean : Serializable {
     @Inject
     private lateinit var resultRepository: ResultRepository
 
-    // Берём последние N точек прямо из БД
+    // 20 точек из бд с конца выидраем с корнем
     fun all(limit: Int = 20): List<PointCheck> =
         resultRepository.findLast(limit).map { it.toPointCheck() }
 
-    // Для обычной формы (submit из JSF)
+    // Для глупи submit
     fun add(point: PointCheck) {
         resultRepository.saveFromPoint(point)
     }
-
-    // На будущее, если где-то вызывается
-    fun trimTo(limit: Int) {
-        // можно ничего не делать, т.к. all(limit) и так режет
-    }
 }
 
-// маппер сущности в PointCheck
+// Сущность делает гадости))))
 fun ResultEntity.toPointCheck(): PointCheck =
     PointCheck(
         x = this.x,

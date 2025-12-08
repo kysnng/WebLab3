@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="jakarta.faces.html"
-      xmlns:ui="jakarta.faces.facelets"
       lang="ru">
 
 <h:head>
@@ -9,15 +8,27 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <title>Лабораторная — Часы</title>
 
-    <!-- CSS через JSF ResourceHandler -->
     <h:outputStylesheet library="css" name="style.css"/>
     <h:outputStylesheet library="css" name="test.css"/>
+    <style type="text/css">
+        @font-face {
+            font-family: "Advaken Sans";
+            src: url("#{resource['fonts:AdvakenSans.otf']}") format("opentype");
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: "Random Grotesque";
+            src: url("#{resource['fonts:RG-SpaciousBook.ttf']}") format("opentype");
+            font-weight: normal;
+            font-style: normal;
+        }
+    </style>
 </h:head>
 
 <h:body>
     <div class="container">
-
-        <!-- Header -->
         <header class="header">
             <h1 class="header__title">Лабораторная работа 2</h1>
             <p class="header__meta">
@@ -27,12 +38,13 @@
             </p>
         </header>
 
-        <!-- Clock -->
         <div class="clock-page">
             <div class="clock-wrap">
-                <div class="clock" id="clock">
+                <div class="clock" id="clock"
+                     data-hours="#{clockBean.hours}"
+                     data-minutes="#{clockBean.minutes}"
+                     data-seconds="#{clockBean.seconds}">
                     <div class="mark"></div>
-
                     <div class="hand hour" id="h"></div>
                     <div class="hand minute" id="m"></div>
                     <div class="hand second" id="s"></div>
@@ -52,38 +64,69 @@
                     <div class="num n11"><span>11</span></div>
                 </div>
 
-                <!-- Кнопка назад -->
-                <h:link outcome="/index" styleClass="btn btn-primary">
+
+                <h:link outcome="/index"
+                        styleClass="btn btn-primary">
                     на основную страницу
                 </h:link>
             </div>
         </div>
     </div>
 
-    <!-- Inline-script (разрешено), полностью рабочий -->
-    <h:outputScript>
-        const h = document.getElementById('h'),
-        m = document.getElementById('m'),
-        s = document.getElementById('s');
+    <h:outputScript target="body">
+        //<![CDATA[
+    (function () {
+        const clockEl = document.getElementById('clock');
+        const hEl = document.getElementById('h');
+        const mEl = document.getElementById('m');
+        const sEl = document.getElementById('s');
 
-        function setTime() {
-        const d = new Date();
-        const sec = d.getSeconds(),
-        min = d.getMinutes(),
-        hr  = d.getHours() % 12;
-
-        const sDeg = sec * 6;
-        const mDeg = min * 6 + sec * 0.1;
-        const hDeg = hr * 30 + min * 0.5;
-
-        s.style.transform = `translate(-50%,-100%) rotate(${sDeg}deg)`;
-        m.style.transform = `translate(-50%,-100%) rotate(${mDeg}deg)`;
-        h.style.transform = `translate(-50%,-100%) rotate(${hDeg}deg)`;
+        if (!clockEl || !hEl || !mEl || !sEl) {
+            console.error("Clock elements not found");
+            return;
         }
 
-        setTime();
-        setInterval(setTime, 1000);
-    </h:outputScript>
+        // Стартовое время с сервера из data-атрибутов (дай бог заработает)
+        let hours = parseInt(clockEl.dataset.hours || "0", 10);
+        let minutes = parseInt(clockEl.dataset.minutes || "0", 10);
+        let seconds = parseInt(clockEl.dataset.seconds || "0", 10);
 
+        function updateHands() {
+            const hr12 = hours % 12;
+
+            const sDeg = seconds * 6;                    // 60 сек в градусы
+            const mDeg = minutes * 6 + seconds * 0.1;   // 60 мин в градусы + плавный ход от паркинсона
+            const hDeg = hr12 * 30 + minutes * 0.5;     // 12 часов в градусы + плавный ход от паркинсона
+
+            sEl.style.transform = 'translate(-50%,-100%) rotate(' + sDeg + 'deg)';
+            mEl.style.transform = 'translate(-50%,-100%) rotate(' + mDeg + 'deg)';
+            hEl.style.transform = 'translate(-50%,-100%) rotate(' + hDeg + 'deg)';
+        }
+
+        function tick() {
+            seconds += 1;
+            if (seconds >= 60) {
+                seconds = 0;
+                minutes += 1;
+            }
+            if (minutes >= 60) {
+                minutes = 0;
+                hours += 1;
+            }
+            if (hours >= 24) {
+                hours = 0;
+            }
+
+            updateHands();
+        }
+
+
+        updateHands();
+
+
+        setInterval(tick, 1000);
+    })();
+    //]]>
+    </h:outputScript>
 </h:body>
 </html>

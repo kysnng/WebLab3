@@ -22,7 +22,7 @@
             <property name="jakarta.persistence.schema-generation.database.action"
                       value="create"/>
 
-            <!-- для EclipseLink -->
+            <!-- для EclipseLink глянуть что конкретно делают -->
             <property name="eclipselink.ddl-generation" value="create-or-extend-tables"/>
             <property name="eclipselink.logging.level" value="FINE"/>
         </properties>

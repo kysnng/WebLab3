@@ -39,7 +39,7 @@ class PointBean : Serializable {
         val execMs = (System.nanoTime() - start) / 1_000_000.0
         val pointCheck = basePoint.copy(execTimeMs = execMs)
 
-        // сохраняем в БД через ResultBean
+        // сохраняем в БД через ResultBean, потому что остальное работает как *********
         resultBean.add(pointCheck)
 
         lastPoint = pointCheck

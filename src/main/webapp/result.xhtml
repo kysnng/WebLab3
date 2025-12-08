@@ -35,7 +35,7 @@
 <h:body>
     <main class="stage">
         <div class="word">
-            <!-- Вариант HIT (рендерим H I T) -->
+            <!-- Вариант HIT -->
             <ui:fragment rendered="#{not empty pointBean.lastPoint and pointBean.lastPoint.result}">
                 <!-- H -->
                 <div class="circle circle--h">
@@ -64,7 +64,7 @@
                 </div>
             </ui:fragment>
 
-            <!-- Вариант MISS (круг-крест + текст MISS) -->
+            <!-- MISS -->
             <ui:fragment rendered="#{not empty pointBean.lastPoint and not pointBean.lastPoint.result}">
                 <div class="spec-circle--x">
                     <svg:svg class="x-handles" viewBox="0 0 100 100" aria-hidden="true" focusable="false">

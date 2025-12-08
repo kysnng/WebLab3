@@ -44,7 +44,7 @@ class PointApiServlet : HttpServlet() {
 
         resultRepository.saveFromPoint(point)
 
-        // ВАЖНО: использовать точку как разделитель
+        // НЕ ЗАБЫТЬ ПОСТАВИТЬ ЭТУ МЕРЗКУ ПРОТИВНУЮ ГАДКУЮ ОТВРАТИТЕЛЬНУЮ ЛОКАЛЬ
         val json = """
             {
               "hit": ${point.result},

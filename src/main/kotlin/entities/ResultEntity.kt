@@ -6,7 +6,7 @@ import java.time.LocalDateTime
 @Entity
 @Table(name = "hit_results")
 open class ResultEntity(
-
+// Я тут долго плакал
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "result_seq")
     @SequenceGenerator(
