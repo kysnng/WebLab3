@@ -2,18 +2,19 @@ const canvas = document.getElementById("graph");
 const ctx = canvas.getContext("2d");
 let points = [];
 
+const form = document.querySelector("form.form");
+const xInput = document.getElementById("x");
+const yInput = document.getElementById("y");
+const rHidden = document.getElementById("rHidden");
+
 function getSelectedR() {
-    const checked = document.querySelector('#r-chips input[name="r-chip"]:checked');
-    return checked ? parseFloat(checked.value) : null;
+    if (!rHidden || !rHidden.value) return null;
+    const v = parseFloat(rHidden.value.replace(",", "."));
+    return Number.isFinite(v) ? v : null;
 }
 
-const form = document.querySelector('form.form');
-const xInput = document.getElementById('x');
-const yInput = document.getElementById('y');
-const rHidden = document.getElementById('r');
-
 function normalizeNumber(str) {
-    const s = str.replace(',', '.').trim();
+    const s = str.replace(",", ".").trim();
     return s;
 }
 
@@ -25,7 +26,7 @@ function isValidCoord(str) {
 }
 
 if (form) {
-    form.addEventListener('submit', (e) => {
+    form.addEventListener("submit", (e) => {
         const xStr = xInput.value;
         if (!isValidCoord(xStr)) {
             e.preventDefault();
@@ -56,22 +57,22 @@ if (form) {
     });
 }
 
-const resultsBody = document.getElementById('results-body');
+const resultsBody = document.getElementById("results-body");
 
 function appendResultRow(json) {
     if (!resultsBody) return;
-    const empty = resultsBody.querySelector('.empty-row');
+    const empty = resultsBody.querySelector(".empty-row");
     if (empty) empty.remove();
 
-    const tr = document.createElement('tr');
-    tr.className = json.hit ? 'hit' : 'miss';
+    const tr = document.createElement("tr");
+    tr.className = json.hit ? "hit" : "miss";
     tr.innerHTML = `
-      <td>${json.hit ? 'Попадание' : 'Промах'}</td>
+      <td>${json.hit ? "Попадание" : "Промах"}</td>
       <td>${Number(json.x).toFixed(3)}</td>
       <td>${Number(json.y).toFixed(3)}</td>
       <td>${json.r}</td>
       <td>${(Number(json.execMs) || 0).toFixed(3)} мс</td>
-      <td>${json.timestamp || ''}</td>
+      <td>${json.timestamp || ""}</td>
     `;
     resultsBody.appendChild(tr);
 }
@@ -84,43 +85,72 @@ function drawGraph(R = 1) {
     ctx.textBaseline = "middle";
 
     ctx.beginPath();
-    ctx.moveTo(0, 300); ctx.lineTo(600, 300);
-    ctx.moveTo(300, 0); ctx.lineTo(300, 600);
+    ctx.moveTo(0, 300);
+    ctx.lineTo(600, 300);
+    ctx.moveTo(300, 0);
+    ctx.lineTo(300, 600);
     ctx.stroke();
 
-    ctx.beginPath(); ctx.moveTo(300, 0); ctx.lineTo(294, 15); ctx.lineTo(306, 15); ctx.closePath(); ctx.fill();
-    ctx.beginPath(); ctx.moveTo(600, 300); ctx.lineTo(585, 306); ctx.lineTo(585, 294); ctx.closePath(); ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(300, 0);
+    ctx.lineTo(294, 15);
+    ctx.lineTo(306, 15);
+    ctx.closePath();
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(600, 300);
+    ctx.lineTo(585, 306);
+    ctx.lineTo(585, 294);
+    ctx.closePath();
+    ctx.fill();
 
-    function tick(x1,y1,x2,y2){ ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke(); }
+    function tick(x1, y1, x2, y2) {
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+    }
 
-    tick(500,305,500,295); tick(400,305,400,295); tick(100,305,100,295); tick(200,305,200,295);
-    tick(295,100,305,100); tick(295,200,305,200); tick(295,400,305,400); tick(295,500,305,500);
+    tick(500, 305, 500, 295);
+    tick(400, 305, 400, 295);
+    tick(100, 305, 100, 295);
+    tick(200, 305, 200, 295);
+    tick(295, 100, 305, 100);
+    tick(295, 200, 305, 200);
+    tick(295, 400, 305, 400);
+    tick(295, 500, 305, 500);
 
     const scale = 200 / R;
-    ctx.fillText("R/2", 300 + scale * R/2 - 10, 320);
-    ctx.fillText("R",   400 + scale * R/2 - 5,  320);
-    ctx.fillText("-R/2",100 + scale * R/2 - 15, 320);
-    ctx.fillText("-R",  scale * R/2 - 10,       320);
+    ctx.fillText("R/2", 300 + (scale * R) / 2 - 10, 320);
+    ctx.fillText("R", 400 + (scale * R) / 2 - 5, 320);
+    ctx.fillText("-R/2", 100 + (scale * R) / 2 - 15, 320);
+    ctx.fillText("-R", scale * R / 2 - 10, 320);
 
-    ctx.fillText("R/2", 310, 100 + scale * R/2 + 5);
-    ctx.fillText("R",   310, scale * R/2);
-    ctx.fillText("-R/2",310, 300 + scale * R/2);
-    ctx.fillText("-R",  310, 400 + scale * R/2);
+    ctx.fillText("R/2", 310, 100 + (scale * R) / 2 + 5);
+    ctx.fillText("R", 310, scale * R / 2);
+    ctx.fillText("-R/2", 310, 300 + (scale * R) / 2);
+    ctx.fillText("-R", 310, 400 + (scale * R) / 2);
 
     ctx.fillText("X", 590, 320);
     ctx.fillText("Y", 310, 10);
 
     ctx.fillStyle = "rgba(0,255,84,0.14)";
-    ctx.fillRect(300 - scale * R, 300, scale*R, scale*0.5*R);
+    ctx.fillRect(300 - scale * R, 300, scale * R, scale * 0.5 * R);
 
     ctx.fillStyle = "rgba(0,60,255,0.15)";
-    ctx.beginPath(); ctx.moveTo(200,300); ctx.lineTo(100+scale*R,200); ctx.lineTo(300,100+scale*R);
-    ctx.closePath(); ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(200, 300);
+    ctx.lineTo(100 + scale * R, 200);
+    ctx.lineTo(300, 100 + scale * R);
+    ctx.closePath();
+    ctx.fill();
 
     ctx.fillStyle = "rgba(255,0,0,0.16)";
-    ctx.beginPath(); ctx.moveTo(300,300);
-    ctx.arc(300,300, scale*R, Math.PI*-0.5, Math.PI*-2, false);
-    ctx.closePath(); ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(300, 300);
+    ctx.arc(300, 300, scale * R, Math.PI * -0.5, Math.PI * -2, false);
+    ctx.closePath();
+    ctx.fill();
 
     for (let p of points) {
         ctx.beginPath();
@@ -130,7 +160,9 @@ function drawGraph(R = 1) {
     }
 }
 
-function round3(v){ return Math.round(v*1000)/1000; }
+function round3(v) {
+    return Math.round(v * 1000) / 1000;
+}
 
 function getClickCoordinates(evt, R) {
     const rect = canvas.getBoundingClientRect();
@@ -149,7 +181,6 @@ async function checkHit(x, y, R) {
         r: R.toString()
     });
 
-    // /webLab3/index.xhtml -> /webLab3/api/point
     const parts = window.location.pathname.split("/");
     const context = parts.length > 1 ? "/" + parts[1] : "";
     const url = context + "/api/point";
@@ -178,7 +209,6 @@ async function checkHit(x, y, R) {
     }
 }
 
-
 canvas.addEventListener("click", async (evt) => {
     try {
         const R = getSelectedR();
@@ -187,24 +217,16 @@ canvas.addEventListener("click", async (evt) => {
             return;
         }
 
-        const {xVal, yVal} = getClickCoordinates(evt, R);
+        const { xVal, yVal } = getClickCoordinates(evt, R);
         const json = await checkHit(xVal, yVal, R);
 
-        points.push({x: xVal, y: yVal, hit: json.hit});
+        points.push({ x: xVal, y: yVal, hit: json.hit });
         drawGraph(R);
         appendResultRow(json);
-    } catch (e){
+    } catch (e) {
         console.error("AJAX/error", e);
         alert("Не удалось проверить точку. Смотрите детали в консоли.");
     }
-});
-
-document.querySelectorAll('#r-chips input[name="r-chip"]').forEach(radio => {
-    radio.addEventListener("change", async () => {
-        const R = parseFloat(radio.value);
-        if (rHidden) rHidden.value = radio.value;
-        drawGraph(R);
-    });
 });
 
 drawGraph(1);

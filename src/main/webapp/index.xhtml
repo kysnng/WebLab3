@@ -84,40 +84,34 @@
 
                             <p:commandButton value="1"
                                              styleClass="chip"
-                                             process="@this"
-                                             update="rHidden"
-                                             onclick="document.getElementById('rHidden').value='1'"
-                            />
+                                             type="button"
+                                             onclick="document.getElementById('rHidden').value='1'; drawGraph(1);" />
 
                             <p:commandButton value="1.5"
                                              styleClass="chip"
-                                             process="@this"
-                                             update="rHidden"
-                                             onclick="document.getElementById('rHidden').value='1.5'" />
+                                             type="button"
+                                             onclick="document.getElementById('rHidden').value='1.5'; drawGraph(1.5);" />
 
                             <p:commandButton value="2"
                                              styleClass="chip"
-                                             process="@this"
-                                             update="rHidden"
-                                             onclick="document.getElementById('rHidden').value='2'" />
+                                             type="button"
+                                             onclick="document.getElementById('rHidden').value='2'; drawGraph(2);" />
 
                             <p:commandButton value="2.5"
                                              styleClass="chip"
-                                             process="@this"
-                                             update="rHidden"
-                                             onclick="document.getElementById('rHidden').value='2.5'" />
+                                             type="button"
+                                             onclick="document.getElementById('rHidden').value='2.5'; drawGraph(2.5);" />
 
                             <p:commandButton value="3"
                                              styleClass="chip"
-                                             process="@this"
-                                             update="rHidden"
-                                             onclick="document.getElementById('rHidden').value='3'" />
+                                             type="button"
+                                             onclick="document.getElementById('rHidden').value='3'; drawGraph(3);" />
 
                         </div>
 
-                        <!-- связанный R -->
                         <h:inputHidden id="rHidden" value="#{pointBean.r}" />
                     </div>
+
 
                     <div class="actions">
                         <p:commandButton value="ПРОВЕРИТЬ ТОЧКУ"
