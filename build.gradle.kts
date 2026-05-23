@@ -35,6 +35,11 @@ tasks.test {
     useJUnitPlatform()
 }
 
+tasks.register<Copy>("copyDeps") {
+    from(configurations.compileClasspath)
+    into("lib")
+}
+
 tasks.war {
     archiveFileName.set("webLab3.war")
 }

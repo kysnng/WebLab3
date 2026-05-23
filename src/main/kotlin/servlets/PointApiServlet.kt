@@ -9,9 +9,13 @@ import org.example.beans.AreaCheckBean
 import org.example.models.PointCheck
 import org.example.repositories.ResultRepository
 import java.util.Locale
-
+/**
+ * Основа всего сайта. Точка входа в серверную часть.
+ * Содержит в себе единственный метод doPost.
+ */
 @WebServlet(name = "PointApiServlet", urlPatterns = ["/api/point"])
 class PointApiServlet : HttpServlet() {
+
 
     @Inject
     private lateinit var areaCheckBean: AreaCheckBean

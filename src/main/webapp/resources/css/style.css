@@ -178,6 +178,10 @@ body .ui-inputfield {
     appearance: none
 }
 
+body .ui-inputfield.ui-state-error {
+    border-color: #f44336 !important;
+}
+
 
 .chip{
     position:relative !important;

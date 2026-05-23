@@ -2,7 +2,12 @@ package org.example.models
 
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-
+/**
+ * Класс-конструктор с встроенными вспомогательными методами.
+ * Собирается из всех параметров "выстрела"
+ * Содержит в себе метод для форматирования дата-время
+ * Содержит в себе метод для преобразования булевого result в текст для пользователя.
+ */
 data class PointCheck(
     val x: Double,
     val y: Double,

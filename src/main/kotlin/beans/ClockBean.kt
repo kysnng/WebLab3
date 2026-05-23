@@ -5,10 +5,12 @@ import jakarta.inject.Named
 import java.io.Serializable
 import java.time.LocalTime
 
+/**
+ * Бин отвечающий за часы на сайте. Просто собирает время по часам, минутам, секундам.
+ */
 @Named("clockBean")
 @ApplicationScoped
 class ClockBean : Serializable {
-
     val hours: Int
         get() = LocalTime.now().hour
 

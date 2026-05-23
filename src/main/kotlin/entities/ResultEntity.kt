@@ -2,11 +2,22 @@ package org.example.entities
 
 import jakarta.persistence.*
 import java.time.LocalDateTime
-
+/**
+ * Результирующий энтити. Основа содержимого БД.
+ * Создает id по стратегии Sequence.
+ * Энтити содержит в себе:
+ * 1. id: Long
+ * 2. x: Double
+ * 3. y: Double
+ * 4. r: Double
+ * 6. hit: Boolean
+ * 7. execMs: Double
+ * 8. ts: LocalDateTime. Хранит в себе время "выстрела" с погрешностью на проверку точки.
+ */
 @Entity
 @Table(name = "hit_results")
 open class ResultEntity(
-// Я тут долго плакал
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "result_seq")
     @SequenceGenerator(

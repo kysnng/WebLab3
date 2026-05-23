@@ -20,7 +20,7 @@ function normalizeNumber(str) {
 
 function isValidCoord(str) {
     const s = normalizeNumber(str);
-    if (!/^[-+]?\d+(\.\d{1,3})?$/.test(s)) return false;
+    if (!/^(-?\d+)(\.\d{1,3})?$/.test(s)) return false;
     const v = parseFloat(s);
     return Number.isFinite(v) && v >= -3 && v <= 3;
 }
@@ -135,20 +135,20 @@ function drawGraph(R = 1) {
     ctx.fillText("Y", 310, 10);
 
     ctx.fillStyle = "rgba(0,255,84,0.14)";
-    ctx.fillRect(300 - scale * R, 300, scale * R, scale * 0.5 * R);
+    ctx.fillRect(500 - scale * R, 100, scale * R/2, scale * R);
 
     ctx.fillStyle = "rgba(0,60,255,0.15)";
     ctx.beginPath();
-    ctx.moveTo(200, 300);
-    ctx.lineTo(100 + scale * R, 200);
-    ctx.lineTo(300, 100 + scale * R);
+    ctx.moveTo(300, 500); //200 300
+    ctx.lineTo(200 + scale * R, 300); // 100 + scale * R, 200
+    ctx.lineTo(300, 100 + scale * R); // 300, 100 + scale * R тут не меняли ничего
     ctx.closePath();
     ctx.fill();
 
     ctx.fillStyle = "rgba(255,0,0,0.16)";
     ctx.beginPath();
-    ctx.moveTo(300, 300);
-    ctx.arc(300, 300, scale * R, Math.PI * -0.5, Math.PI * -2, false);
+    ctx.moveTo(300, 300); // 300 300
+    ctx.arc(300, 300, scale * R/2, Math.PI * -1, Math.PI * -0.5, false);
     ctx.closePath();
     ctx.fill();
 

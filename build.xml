@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="WebLab3" default="build" basedir=".">
+
+    <!-- загрузка параметров из файла билды-->
+    <property file="build.properties"/>
+
+    <!--  Муравей для Котлина -->
+    <taskdef resource="org/jetbrains/kotlin/ant/antlib.xml">
+        <classpath>
+            <pathelement path="${lib.dir}/kotlin-ant.jar"/>
+            <pathelement path="${lib.dir}/kotlin-compiler.jar"/>
+            <pathelement path="${lib.dir}/kotlin-stdlib.jar"/>
+            <pathelement path="${lib.dir}/kotlin-reflect.jar"/>
+            <pathelement path="${lib.dir}/kotlin-script-runtime.jar"/>
+        </classpath>
+    </taskdef>
+
+    <!--  Для класспаса берем все jar из lib/ -->
+    <path id="compile.classpath">
+        <fileset dir="${lib.dir}" includes="*.jar"/>
+    </path>
+
+    <!-- TARGET: compile -->
+    <!-- компиляция моих великолепных исходных кодов проекта -->
+    <target name="compile" description="Compile origin code of project">
+        <mkdir dir="${classes.dir}"/>
+        <kotlinc src="${src.dir}"
+                 output="${classes.dir}"
+                 classpathref="compile.classpath"/>
+        <echo message="!!!!YAPPIE!!!! Compile finished in ${classes.dir}"/>
+    </target>
+
+    <!-- TARGET: build -->
+    <!-- Компиляция и упаковка в WAR с MANIFEST.MF -->
+    <target name="build" depends="compile" description="Building WAR-archive">
+        <mkdir dir="${dist.dir}"/>
+
+        <war destfile="${dist.dir}/${war.name}"
+             webxml="${webapp.dir}/WEB-INF/web.xml">
+
+            <!-- веб-ресурсы -->
+            <fileset dir="${webapp.dir}">
+                <exclude name="WEB-INF/web.xml"/>
+            </fileset>
+
+            <!-- скомпилированные классы -->
+            <classes dir="${classes.dir}"/>
+
+            <!-- persistence.xml и др. -->
+            <classes dir="${resources.dir}"/>
+
+            <!-- зависимости (только runtime, не compileOnly) -->
+            <lib dir="${lib.dir}">
+                <exclude name="kotlin-ant.jar"/>
+                <exclude name="jakarta.jakartaee-web-api*.jar"/>
+                <exclude name="jakarta.servlet.jsp.jstl*.jar"/>
+            </lib>
+
+            <manifest>
+                <attribute name="Implementation-Title"   value="${project.name}"/>
+                <attribute name="Implementation-Version" value="${project.version}"/>
+                <attribute name="Implementation-Vendor"  value="${project.group}"/>
+                <attribute name="Built-By"               value="${user.name}"/>
+            </manifest>
+        </war>
+
+        <echo message="!!!!YAPPIE!!!! WAR built in ${dist.dir}/${war.name}"/>
+    </target>
+
+    <!-- TARGET: clean -->
+    <!-- удаление скомпилированных классов и временных файлов -->
+    <target name="clean" description="Cleaning temp files and classes">
+        <delete dir="${build.dir}" quiet="true"/>
+        <delete dir="${dist.dir}"  quiet="true"/>
+        <echo message="!!!!YAPPIE!!!! Cleaning finished!!!"/>
+    </target>
+
+    <!-- TARGET: test -->
+    <!-- запуск JUnit-тестов  -->
+    <target name="test" depends="build" description="Starting JUnit-test">
+        <mkdir dir="${test.classes.dir}"/>
+
+        <!-- компиляция тестов -->
+        <kotlinc src="${test.src.dir}"
+                 output="${test.classes.dir}"
+                 classpathref="compile.classpath">
+            <classpath>
+                <pathelement path="${classes.dir}"/>
+                <fileset dir="${lib.dir}" includes="*.jar"/>
+            </classpath>
+        </kotlinc>
+
+        <!-- запуск тестов -->
+        <java jar="${junit.standalone.jar}" fork="true" failonerror="false">
+            <arg value="--classpath"/>
+            <arg path="${classes.dir}:${test.classes.dir}:${toString:compile.classpath}"/>
+            <arg value="--scan-classpath"/>
+            <arg value="--details=verbose"/>
+        </java>
+
+        <echo message="OMG I'M SO HOT || Tests finished"/>
+    </target>
+
+    <!-- TARGET: doc -->
+    <!-- MD5/SHA-1 в MANIFEST.MF + javadoc внутри WAR -->
+    <target name="doc" depends="build" description="Adding hashes in MANIFEST and generating javadoc">
+
+        <!-- вычисляем MD5 и SHA-1 для собранного WAR -->
+        <checksum file="${dist.dir}/${war.name}"
+                  algorithm="MD5"
+                  property="war.md5"/>
+        <checksum file="${dist.dir}/${war.name}"
+                  algorithm="SHA-1"
+                  property="war.sha1"/>
+
+        <!-- обновляем MANIFEST.MF с хэшами -->
+        <war destfile="${dist.dir}/${war.name}"
+             webxml="${webapp.dir}/WEB-INF/web.xml"
+             update="true">
+            <manifest>
+                <attribute name="Implementation-Version" value="${project.version}"/>
+                <attribute name="MD5-Checksum" value="${war.md5}"/>
+                <attribute name="SHA-1-Checksum" value="${war.sha1}"/>
+            </manifest>
+        </war>
+
+        <!-- генерируем Javadoc -->
+        <mkdir dir="${doc.dir}"/>
+        <java jar="${dokka.cli.jar}" fork="true" failonerror="false">
+            <arg value="-pluginsClasspath"/>
+            <arg file="${dokka.base.jar}"/>
+            <arg value="-pluginsClasspath"/>
+            <arg file="${dokka.analysis.jar}"/>
+            <arg value="-pluginsClasspath"/>
+            <arg file="${dokka.dir}/kotlinx-html-jvm-0.11.0.jar"/>
+            <arg value="-pluginsClasspath"/>
+            <arg file="${dokka.freemarker.jar}"/>
+            <arg value="-sourceSet"/>
+            <arg value="-src ${src.dir}"/>
+            <arg value="-outputDir"/>
+            <arg file="${doc.dir}"/>
+        </java>
+
+        <!-- добавляем javadoc в WAR -->
+        <zip destfile="${dist.dir}/${war.name}" update="true">
+            <zipfileset dir="${doc.dir}" prefix="javadoc"/>
+        </zip>
+
+        <echo message="[doc] MD5:   ${war.md5}"/>
+        <echo message="[doc] SHA-1: ${war.sha1}"/>
+        <echo message="[doc] Javadoc added in WAR -> ${dist.dir}/${war.name}"/>
+    </target>
+
+    <!-- TARGET: scp -->
+    <!-- отправка WAR на сервер по SCP  -->
+    <target name="scp" depends="build" description="Sending WAR on server by SCP">
+
+        <!-- тут еще для работы нужен jsch.jar в lib/. Это сделаль -->
+        <scp file="${dist.dir}/${war.name}"
+             todir="${scp.user}:${scp.password}@${scp.host}:${scp.remote.dir}"
+             trust="true"
+             port="2222"/>
+
+        <echo message="[scp] File ${war.name} sent on  ${scp.host}:${scp.remote.dir}"/>
+    </target>
+
+    <!-- TARGET: diff -->
+    <!-- проверка рабочей копии SVN; commit если классы не затронуты -->
+    <target name="diff" description="Checking changes in SVN and commit">
+        <exec executable="svn" outputproperty="svn.diff.output" failonerror="false">
+            <arg value="diff"/>
+            <arg value="${svn.working.dir}"/>
+        </exec>
+
+        <echo message="[diff] Result svn diff:"/>
+        <echo message="${svn.diff.output}"/>
+
+        <condition property="classes.changed">
+            <or>
+                <contains string="${svn.diff.output}" substring="AreaCheckBean"/>
+                <contains string="${svn.diff.output}" substring="ResultEntity"/>
+            </or>
+        </condition>
+
+        <antcall target="diff.commit"/>
+        <antcall target="diff.skip"/>
+    </target>
+
+    <target name="diff.commit" unless="classes.changed">
+        <echo message="[diff] Protected classes have no changes - commiting"/>
+        <exec executable="svn" failonerror="false">
+            <arg value="commit"/>
+            <arg value="${svn.working.dir}"/>
+            <arg value="-m"/>
+            <arg value="Auto-commit by Ant diff target"/>
+        </exec>
+    </target>
+
+    <target name="diff.skip" if="classes.changed">
+        <echo message="[diff] Found changes in protected classes — commit canceled"/>
+    </target>
+
+    <!-- TARGET: env -->
+    <!-- сборка и запуск в альтернативных окружениях (разные JVM args) -->
+    <target name="env" depends="build" description="Starting in alternative environments">
+
+        <echo message="[env] Environment 1: args: ${env.jvmargs.1}"/>
+        <java classname="org.example.MainKt"
+              classpathref="compile.classpath"
+              fork="true"
+              failonerror="false">
+            <classpath>
+                <pathelement path="${classes.dir}"/>
+                <fileset dir="${lib.dir}" includes="*.jar"/>
+            </classpath>
+            <jvmarg line="${env.jvmargs.1}"/>
+        </java>
+
+        <echo message="[env] Environment 2: args: ${env.jvmargs.2}"/>
+        <java classname="org.example.MainKt"
+              classpathref="compile.classpath"
+              fork="true"
+              failonerror="false">
+            <classpath>
+                <pathelement path="${classes.dir}"/>
+                <fileset dir="${lib.dir}" includes="*.jar"/>
+            </classpath>
+            <jvmarg line="${env.jvmargs.2}"/>
+        </java>
+
+        <echo message="[env] Starting in alternative environments finished"/>
+    </target>
+</project>

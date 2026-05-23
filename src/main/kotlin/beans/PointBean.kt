@@ -5,12 +5,16 @@ import jakarta.inject.Inject
 import jakarta.inject.Named
 import org.example.models.PointCheck
 import org.example.models.ResultBean
-import org.example.beans.AreaCheckBean
 import java.io.Serializable
 
+/**
+ * Бин - основный этап проверки точки. Собирает все данные в строковом представлении и пропускает через все
+ * необходимые методы
+ */
 @Named
 @SessionScoped
 class PointBean : Serializable {
+
     var x: String = ""
     var y: String = ""
     var r: String = ""
@@ -24,6 +28,12 @@ class PointBean : Serializable {
     private lateinit var resultBean: ResultBean
 
     fun submit(): String? {
+        /**
+         * Метод отправки точки. Валидует точку с выводом ошибки при неудаче.
+         * Дополнительно проводит чистку от ','.
+         * Засекает текущее время, проводит операцию checkPoint и сравнивает текущее время со стартом
+         * Записывает разницу в класс для отображения в entity.
+         */
         val isValid = areaCheckBean.validateInputStrings(x, y, r)
         if (!isValid) {
             error = "Некорректные значения параметров"
@@ -39,7 +49,7 @@ class PointBean : Serializable {
         val execMs = (System.nanoTime() - start) / 1_000_000.0
         val pointCheck = basePoint.copy(execTimeMs = execMs)
 
-        // сохраняем в БД через ResultBean, потому что остальное работает как *********
+        // сохраняем в БД через ResultBean, потому что остальное работает не оч
         resultBean.add(pointCheck)
 
         lastPoint = pointCheck
@@ -48,5 +58,8 @@ class PointBean : Serializable {
     }
 
     fun getResults(): List<PointCheck> = resultBean.all(20)
+    /**
+     * Метод выводит 20 последних результатов "выстрелов".
+     */
 }
 
